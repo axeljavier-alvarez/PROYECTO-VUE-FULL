@@ -16,7 +16,4 @@ import PublicFooter from './components/PublicFooter.vue';
 
     <PublicFooter></PublicFooter>
 
-
-
-
 </template>

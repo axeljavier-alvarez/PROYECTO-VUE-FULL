@@ -1,13 +1,30 @@
+<script setup>
+import { ref } from 'vue';
+import PublicNavLink from './PublicNavLink.vue';
+
+const isMenuOpen = ref(false);
+const isUserMenuOpen = ref(false);
+
+const toggleMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value;
+};
+
+const toggleUserMenu = () => {
+    isUserMenuOpen.value = !isUserMenuOpen.value;
+};
+</script>
+
 <template>
-    
-<nav class="bg-neutral-primary fixed w-full z-20 top-0 start-0 border-b border-default">
+
+    <nav class="bg-neutral-primary fixed w-full z-20 top-0 start-0 border-b border-default">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
 
-            <a href="#" class="flex items-center space-x-3">
+            <!-- LOGO -->
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
                 <img
                     src="https://flowbite.com/docs/images/logo.svg"
                     class="h-7"
-                    alt="Logo"
+                    alt="Flowbite Logo"
                 />
 
                 <span class="self-center text-xl text-heading font-semibold whitespace-nowrap">
@@ -15,37 +32,156 @@
                 </span>
             </a>
 
-            <div class="flex md:order-2">
+            <!-- RIGHT SIDE -->
+            <div class="flex items-center md:order-2 gap-3">
+
+                <!-- USER BUTTON -->
+                <div class="relative">
+
+                    <button
+                        type="button"
+                        @click="toggleUserMenu"
+                        class="flex text-sm bg-neutral-primary rounded-full focus:ring-4 focus:ring-neutral-tertiary"
+                    >
+                        <span class="sr-only">Open user menu</span>
+
+                        <img
+                            class="w-8 h-8 rounded-full"
+                            src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                            alt="user photo"
+                        />
+                    </button>
+
+                    <!-- USER DROPDOWN -->
+                    <div
+                        v-if="isUserMenuOpen"
+                        class="absolute right-0 mt-2 z-50 bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44"
+                    >
+                        <div class="px-4 py-3 text-sm border-b border-default">
+                            <span class="block text-heading font-medium">
+                                Joseph McFall
+                            </span>
+
+                            <span class="block text-body truncate">
+                                name@flowbite.com
+                            </span>
+                        </div>
+
+                        <ul class="p-2 text-sm text-body font-medium">
+                            <li>
+                                <a
+                                    href="#"
+                                    class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                                >
+                                    Dashboard
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="#"
+                                    class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                                >
+                                    Settings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="#"
+                                    class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                                >
+                                    Earnings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    href="#"
+                                    class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                                >
+                                    Sign out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- HAMBURGER -->
                 <button
+                    @click="toggleMenu"
                     type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-4 py-2"
+                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-body rounded-base md:hidden hover:bg-neutral-secondary-soft hover:text-heading focus:outline-none focus:ring-2 focus:ring-neutral-tertiary"
                 >
-                    Login
+                    <span class="sr-only">Open main menu</span>
+
+                    <svg
+                        class="w-6 h-6"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-width="2"
+                            d="M5 7h14M5 12h14M5 17h14"
+                        />
+                    </svg>
                 </button>
+
             </div>
 
-            <div class="hidden md:flex md:w-auto">
-                <ul class="flex flex-row gap-8 font-medium">
-                    <li>
-                        <a href="#" class="text-heading hover:text-blue-500">
-                            Home
-                        </a>
-                    </li>
+            <!-- MENU -->
+            <div
+                :class="[
+                    isMenuOpen ? 'flex' : 'hidden',
+                    'items-center justify-between w-full md:flex md:w-auto md:order-1'
+                ]"
+            >
+
+                <ul
+                    class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-neutral-primary w-full md:w-auto"
+                >
+
+                  
 
                     <li>
-                        <a href="#" class="text-heading hover:text-blue-500">
+                        <!-- <a
+                            href="#"
+                            class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:hover:text-fg-brand md:p-0"
+                        >
                             About
-                        </a>
+                        </a> -->
+                        <publicNavLink :to="{
+                            name: 'home'
+                        }">
+                        Home
+                        </publicNavLink>
+                        <PublicNavLink to="/about">
+                            About
+                        </PublicNavLink>
+                      
                     </li>
 
-                    <li>
-                        <a href="#" class="text-heading hover:text-blue-500">
-                            Contact
+                    <!-- <li>
+                        <a
+                            href="#"
+                            class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:hover:text-fg-brand md:p-0"
+                        >
+                            Services
                         </a>
-                    </li>
+                    </li> -->
+
+                    
+
                 </ul>
+
             </div>
 
         </div>
     </nav>
+
 </template>
