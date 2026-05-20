@@ -148,13 +148,7 @@ const toggleUserMenu = () => {
 
                   
 
-                    <li>
-                        <!-- <a
-                            href="#"
-                            class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:hover:text-fg-brand md:p-0"
-                        >
-                            About
-                        </a> -->
+                    <li>                        
                         <publicNavLink :to="{
                             name: 'home'
                         }">
@@ -162,21 +156,8 @@ const toggleUserMenu = () => {
                         </publicNavLink>
                         <PublicNavLink to="/about">
                             About
-                        </PublicNavLink>
-                      
-                    </li>
-
-                    <!-- <li>
-                        <a
-                            href="#"
-                            class="block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:hover:text-fg-brand md:p-0"
-                        >
-                            Services
-                        </a>
-                    </li> -->
-
-                    
-
+                        </PublicNavLink>                      
+                    </li>                    
                 </ul>
 
             </div>
