@@ -1,8 +1,13 @@
-import dashboardRoutes from '@/modules/admin/submodules/dashboard/router/index';
+import dashboardRoutes from '@/modules/admin/dashboard/router/index';
 
 
 const routes = [
-
+  {
+    path: '',
+    redirect: {
+      name: 'admin.dashboard'
+    }
+  }, 
   ...dashboardRoutes,
 ];
 

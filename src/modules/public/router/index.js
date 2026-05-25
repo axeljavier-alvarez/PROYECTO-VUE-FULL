@@ -1,7 +1,7 @@
-import aboutRoutes from '@/modules/public/submodules/about/router/index'
-import blogRoutes from '@/modules/public/submodules/blog/router/index'
-import contactRoutes from '@/modules/public/submodules/contact/router/index'
-import homeRoutes from '@/modules/public/submodules/home/router/index'
+import aboutRoutes from '@/modules/public/about/router/index'
+import blogRoutes from '@/modules/public/blog/router/index'
+import contactRoutes from '@/modules/public/contact/router/index'
+import homeRoutes from '@/modules/public/home/router/index'
 
 const routes = [
     // destructuración array
