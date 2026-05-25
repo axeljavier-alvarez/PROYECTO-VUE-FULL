@@ -1,5 +1,7 @@
 <script setup>
 const openSidebar = defineModel();
+import AppLogo from '@/modules/shared/components/AppLogo.vue'
+
 </script>
 <template>
      <nav class="fixed top-0 z-50 w-full bg-neutral-primary-soft border-b border-default">
@@ -17,11 +19,9 @@ const openSidebar = defineModel();
                                 d="M5 7h14M5 12h14M5 17h10" />
                         </svg>
                     </button>
-                    <a href="https://flowbite.com" class="flex ms-2 md:me-24">
-                        <img src="https://flowbite.com/docs/images/logo.svg" class="h-6 me-3" alt="FlowBite Logo" />
-                        <span
-                            class="self-center text-lg font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-                    </a>
+                    <RouterLink to="/">
+                        <AppLogo />
+                    </RouterLink>
                 </div>
                 <div class="flex items-center">
                     <div class="flex items-center ms-3">
