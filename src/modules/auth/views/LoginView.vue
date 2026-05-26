@@ -14,7 +14,7 @@ const router = useRouter();
 
 const credentials = reactive({
     email: 'victor@codersfree.com',
-    password: '12345678'
+    password: '123456789'
 });
 async function handleLogin(){
      try {
