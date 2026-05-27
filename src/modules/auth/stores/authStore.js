@@ -13,14 +13,25 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response = await authService.login(credentials);
             localStorage.setItem('access_token', response.access_token);
+            token.value = response.access_token;
         } catch (error){
             throw error; 
         }
     }
 
+    async function logout(){
+        try {
+            await authService.logout();
+            localStorage.removeItem('access_token');
+            token.value = null;
+        } catch(error){
+            throw error;
+        }
+    }
+
     return {
-        token, 
         isAuthenticated, 
-        login
+        login,
+        logout
     };
 });

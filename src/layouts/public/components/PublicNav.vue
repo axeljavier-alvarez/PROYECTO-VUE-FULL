@@ -4,9 +4,13 @@ import { RouterLink } from 'vue-router';
 import PublicNavLink from './PublicNavLink.vue';
 import DropdownMenu from '@/modules/shared/components/DropdownMenu.vue';
 import AppLogo from '@/modules/shared/components/AppLogo.vue'
-
+import DropdownItem from '@/modules/shared/components/DropdownItem.vue';
 const isMenuOpen = ref(false);
 const isUserMenuOpen = ref(false);
+
+
+import { useAuthStore } from '@/modules/auth/stores/authStore';
+const authStore = useAuthStore();
 
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value;
@@ -49,22 +53,36 @@ const toggleUserMenu = () => {
                         </button>
                     </template>
 
-                    <!-- ITEMS -->
-                    <RouterLink :to="{ name: 'admin.dashboard' }"
-                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
-                        Admin
-                    </RouterLink>
 
-                    <RouterLink :to="{ name: 'login' }"
+                <!-- ADMIN -->
+                    <template v-if="authStore.isAuthenticated">
+                        <DropdownItem :to="{ name: 'admin.dashboard' }"
+                            class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
+                            Admin
+                        </DropdownItem>
+
+                        <button 
+                        @click="authStore.logout()"
+                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
+                        Logout
+                        </button>
+                    </template>
+                    <!-- ITEMS -->
+                     <template v-else>
+                    <DropdownItem :to="{ name: 'login' }"
                         class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
                         Iniciar sesión
-                    </RouterLink>
+                    </DropdownItem>
 
-                    <RouterLink :to="{ name: 'register' }"
+                    <DropdownItem :to="{ name: 'register' }"
                         class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition">
                         Registrarse
-                    </RouterLink>
+                    </DropdownItem>
 
+                     </template>
+
+
+                   
                 </DropdownMenu>
 
 

@@ -18,6 +18,7 @@ const toggleDropdown = () => {
 
         <!-- DROPDOWN -->
         <div
+        @click="open = false"
             v-show="open"
             class="absolute z-50 end-0 mt-2 w-48"
         >
