@@ -98,7 +98,6 @@ const confirmarEnvio = async () => {
                                 {{ store.errors.nombres[0] }}
                             </p>
                         </div>
-
                         <div>
                             <Input
                                 v-model="store.form.apellidos"
@@ -112,18 +111,14 @@ const confirmarEnvio = async () => {
                                 {{ store.errors.apellidos[0] }}
                             </p>
                         </div>
-
                     </div>
-
                     <div class="grid md:grid-cols-2 gap-4">
-
                         <div>
                             <Input
                                 v-model="store.form.email"
                                 type="email"
                                 placeholder="Correo electrónico"
                             />
-
                             <p
                                 v-if="store.errors?.email"
                                 class="text-sm text-red-500 mt-1"
@@ -135,30 +130,24 @@ const confirmarEnvio = async () => {
                         <div>
 
                             <div class="relative">
-
                                 <img
                                     :src="banderaGuatemala"
                                     alt="Guatemala"
                                     class="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-auto z-10"
                                 >
-
                                 <Input
                                     v-model="store.form.telefono"
                                     placeholder="Teléfono"
                                     class="pl-12"
                                 />
-
                             </div>
-
                             <p
                                 v-if="store.errors?.telefono"
                                 class="text-sm text-red-500 mt-1"
                             >
                                 {{ store.errors.telefono[0] }}
                             </p>
-
                         </div>
-
                     </div>
 
                     <Input
