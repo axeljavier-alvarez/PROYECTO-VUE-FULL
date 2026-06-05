@@ -27,6 +27,18 @@ const router = createRouter({
       },
       component: () => import('@/layouts/admin/AdminLayout.vue'),
       children: adminRoutes
+    },
+    {
+      path: '/solicitud',
+      component: () => import('@/layouts/public/SolicitudLayout.vue'),
+      children: [
+        {
+            path: '',
+            name: 'solicitud-create',
+            component: () =>
+                import('@/modules/public/solicitud/views/SolicitudCreateView.vue')
+        }
+      ]
     }
     
   ],
