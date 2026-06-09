@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import solicitudService from '../services/solicitudService';
-
-
-
 export const useSolicitudStore = defineStore('solicitud', ()=> {
     const loading = ref(false);
-    const errors = ref({})
+    const errors = ref({});
+    const tramites = ref([]);
     const form = ref({
         nombres: '',
         apellidos: '',
@@ -15,9 +13,19 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
         cui: '',
         domicilio: '',
         observaciones: '',
-        razon: ''
+        razon: '',
+        zona: '',
+        tramite_id: ''
     });
-
+    async function fetchTramites(){
+        try {
+            const response = await solicitudService.getAll();
+            // Si Laravel mandó la colección envuelta, se toma response.data, si no, la response directa
+            tramites.value = response.data || response;
+        } catch(error){
+            console.error('Error al cargar trámites en el store:', error);
+        }
+    }
     async function createSolicitud(){
         loading.value = true;
         errors.value = {}
@@ -38,7 +46,8 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
         form, 
         loading,
         createSolicitud,
-        errors
+        errors,
+        tramites, 
+        fetchTramites
     }
-
 });

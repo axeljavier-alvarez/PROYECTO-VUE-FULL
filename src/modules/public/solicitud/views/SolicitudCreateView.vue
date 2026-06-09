@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useSolicitudStore } from '../stores/solicitudStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
@@ -29,19 +30,22 @@ import iconoMunicipalidad from '@/assets/images/icono_municipalidad.png'
 import banderaGuatemala from '@/assets/images/guatemala_flag.png'
 
 const store = useSolicitudStore()
-
+// DISPARAMOS EL LLAMADO A LA API AL MONTAR EL COMPONENTE
+onMounted(async () => {
+    await store.fetchTramites()
+})
 const openConfirm = ref(false)
 const openSuccess = ref(false)
 const numeroSolicitud = ref('')
-
+const zonasGuate = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 24, 25
+]
 const confirmarEnvio = async () => {
+    openConfirm.value = false
     try {
-
         const response = await store.createSolicitud()
-
         numeroSolicitud.value = response.data.no_solicitud
-
-        openConfirm.value = false
+        // openConfirm.value = false
         openSuccess.value = true
 
         // Limpiar formulario
@@ -52,6 +56,8 @@ const confirmarEnvio = async () => {
         store.form.cui = ''
         store.form.domicilio = ''
         store.form.razon = ''
+        store.form.zona = ''
+        store.form.tramite_id = ''
         store.form.observaciones = ''
 
     } catch (error) {
@@ -124,24 +130,77 @@ const confirmarEnvio = async () => {
                             DPI
                         </Label>
                         <Input v-model="store.form.cui" placeholder="Ingrese su dpi" />
+                        <p v-if="store.errors?.cui" class="text-sm text-red-500 mt-1">
+                            {{ store.errors.cui[0] }}
+                        </p>
                     </div>
                     <div class="grid gap-2">
                         <Label>
                             Domicilio
                         </Label>
-                    <Textarea v-model="store.form.domicilio" placeholder="Ingrese la dirección de su domicilio" />
+                        <Textarea v-model="store.form.domicilio" placeholder="Ingrese la dirección de su domicilio" />
+                        <p v-if="store.errors?.domicilio" class="text-sm text-red-500 mt-1">
+                            {{ store.errors.domicilio[0] }}
+                        </p>
                     </div>
                     <div class="grid gap-2">
                         <Label>
                             Razón
                         </Label>
-                    <Textarea v-model="store.form.razon" placeholder="Razón de la solicitud" />
+                        <Textarea v-model="store.form.razon" placeholder="Razón de la solicitud" />
+                        <p v-if="store.errors?.razon" class="text-sm text-red-500 mt-1">
+                            {{ store.errors.razon[0] }}
+                        </p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="grid gap-2">
+                            <Label for="zona" class="font-semibold text-gray-700">
+                                Zona
+                            </Label>
+                            <Select v-model="store.form.zona">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Seleccione una zona" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem v-for="z in zonasGuate" :key="z" :value="String(z)">
+                                            {{ z }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            <p v-if="store.errors?.zona" class="text-sm text-red-500 mt-1">
+                                {{ store.errors.zona[0] }}
+                            </p>
+                        </div>
+                        <div class="grid gap-2">
+                            <Label for="tramite_id" class="font-semibold text-gray-700">
+                                Tipo de Trámite
+                            </Label>
+                            <Select v-model="store.form.tramite_id">
+                                <SelectTrigger class="w-full">
+                                    <SelectValue placeholder="Seleccione el trámite" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem v-for="tramite in store.tramites" :key="tramite.id"
+                                            :value="String(tramite.id)">
+                                            {{ tramite.nombre }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                             <p v-if="store.errors?.tramite_id" class="text-sm text-red-500 mt-1">
+                                {{ store.errors.tramite_id[0] }}
+                            </p>
+                        </div>
                     </div>
                     <div class="grid gap-2">
                         <Label>
                             Observaciones
                         </Label>
-                    <Textarea v-model="store.form.observaciones" placeholder="Ingrese las observaciones" />
+                        <Textarea v-model="store.form.observaciones" placeholder="Ingrese las observaciones" />
                     </div>
                     <Button type="button" @click="openConfirm = true" :disabled="store.loading">
                         {{

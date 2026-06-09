@@ -1,6 +1,16 @@
 import apiClient from '@/api/axiosConfig';
 
 export default {
+
+    async getAll(){
+        try {
+            const response = await apiClient.get('/tramites');
+            return response.data;
+        } catch(error){
+            console.error('Error en tramiteService:', error.response?.data || error.message);
+            throw error;
+        }
+    },
     async create(data){
         try {
             const response = await apiClient.post('/solicitudes', data);
