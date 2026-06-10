@@ -24,5 +24,15 @@ export default {
     async getById(id) {
         const response = await apiClient.get(`/solicitudes/${id}`);
         return response.data;
+    },
+
+    async validarPaso(data){
+        try {
+            const response = await apiClient.post('/solicitudes/validar-paso', data);
+            return response.data;
+        } catch(error){
+            console.error('Error en validarPaso:', error.response?.data || error.message)
+            throw error;
+        }
     }
 }

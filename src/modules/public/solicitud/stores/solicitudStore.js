@@ -42,12 +42,31 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
         }
     }
 
+    async function validarPaso(step){
+        loading.value = true;
+        errors.value = {}; // limpiar errores paso anterior
+        try {
+            // unir numero paso con datos actuales form
+            const data = { step, ...form.value };
+            await solicitudService.validarPaso(data);
+            return true;
+        }catch(error){
+            if(error.response?.status === 422){
+                errors.value = error.response.data.errors;
+            }
+            return false;
+        }finally {
+            loading.value = false;
+        }
+    }
+
     return {
         form, 
         loading,
         createSolicitud,
         errors,
         tramites, 
-        fetchTramites
+        fetchTramites,
+        validarPaso
     }
 });
