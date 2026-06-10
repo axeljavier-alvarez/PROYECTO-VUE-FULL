@@ -210,7 +210,7 @@ const confirmarEnvio = async () => {
                         </div>
                     </div>
                     <!-- VALIDACION PASO 2 -->
-                    <div v-if="currentStep === 2" class="grid gap-6">
+                    <div v-if="currentStep === 1" class="grid gap-6">
                         <div>
                             <div class="grid gap-2">
                                 <Label for="tramite_id" class="font-semibold text-gray-700">
@@ -246,6 +246,17 @@ const confirmarEnvio = async () => {
                                 <p v-if="store.errors?.razon" class="text-sm text-red-500 mt-1">
                                     {{ store.errors.razon[0] }}
                                 </p>
+                            </div>
+                            <div>
+                                <Label class="mt-5 mb-2 flex justify-center text-2xl font-bold text-[#0D057F]">
+                                    REQUISITOS
+                                </Label>
+
+                                <CardDescription v-if="currentStep === 1"
+                                    class="mx-6 rounded-md bg-[#EFF6FF] text-[#030EA7] text-base py-2 px-4 text-center">
+                                    Recuerde que puede subir únicamente documentos PDF o JPG
+                                </CardDescription>
+                                
                             </div>
                         </div>
                     </div>
