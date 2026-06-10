@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useSolicitudStore } from '../stores/solicitudStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -17,7 +17,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-
 import {
     Dialog,
     DialogContent,
@@ -28,7 +27,24 @@ import {
 
 import iconoMunicipalidad from '@/assets/images/icono_municipalidad.png'
 import banderaGuatemala from '@/assets/images/guatemala_flag.png'
-
+const tituloRazon = computed(() => {
+    switch (store.form.tramite_id) {
+        case '1':
+            return 'Título'
+        case '2':
+            return 'Razón'
+        default:
+            return 'Razón'
+    }
+})
+const placeholderRazon = computed(() => {
+    switch (store.form.tramite_id) {
+        case '1':
+            return 'Licenciatura en Administración'
+        default:
+            return 'Solicitud de actualización de datos'
+    }
+})
 const store = useSolicitudStore()
 // nuevo paso
 const currentStep = ref(1)
@@ -43,8 +59,7 @@ const zonasGuate = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 24, 25
 ]
 const irAlSiguientePaso = async () => {
-    const pasoValido = await store.validarPaso(currentStep.value)
-    if (pasoValido) {
+    if (await store.validarPaso(currentStep.value)) {
         currentStep.value++
     }
 }
@@ -63,52 +78,46 @@ const confirmarEnvio = async () => {
         openSuccess.value = true
 
         currentStep.value = 1
-        // Limpiar formulario
-        store.form.nombres = ''
-        store.form.apellidos = ''
-        store.form.email = ''
-        store.form.telefono = ''
-        store.form.cui = ''
-        store.form.domicilio = ''
-        store.form.razon = ''
-        store.form.zona = ''
-        store.form.tramite_id = ''
-        store.form.observaciones = ''
-
+        // Limpiar campos, reset automatico
+        Object.keys(store.form).forEach(key => store.form[key] = '')
     } catch (error) {
         console.error(error)
     }
 }
 </script>
 <template>
-    <div class="container max-w-4xl mx-auto py-10 px-4">
-
-        <Card>
+    <div>
+        <Card class="max-w-4xl mx-auto mt-5">
             <CardHeader>
-
                 <img :src="iconoMunicipalidad" class="mx-auto h-30 w-auto mb-4">
-                <div class="flex justify-between items-center mb-6 max-w-xs mx-auto">
-                    <span v-for="step in 3" :key="step" :class="[
-                        'h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-200',
-                        currentStep === step ? 'bg-[#032C8F] text-white border-[#032C8F]' : currentStep > step ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-400 border-gray-200'
-                    ]">
-                        {{ step }}
-                    </span>
-                </div>
 
                 <CardTitle class="text-3xl text-center font-bold text-[#032C8F]">
                     Constancia de Residencia
                 </CardTitle>
+
                 <CardDescription class="text-center text-base mt-2">
+                    Complete la información requerida para registrar su solicitud
+                </CardDescription>
+                <div class="flex justify-center gap-3 mt-2 items-center mx-auto"> <span v-for="step in 3" :key="step"
+                        :class="[
+                            'h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-200',
+                            currentStep === step ? 'bg-[#83BD3F] text-white border-[#FFFFFF]' : currentStep > step ? 'bg-white text-gray-400 border-gray-200' : 'bg-white text-gray-400 border-gray-200'
+                        ]">
+                        {{ step }}
+                    </span>
+                </div>
+                <!-- <CardDescription class="text-center text-base mt-2">
                     Paso {{ currentStep }} de 3:
                     <span v-if="currentStep === 1" class="font-medium">Datos Personales</span>
                     <span v-if="currentStep === 2" class="font-medium">Detalles de la Solicitud</span>
                     <span v-if="currentStep === 3" class="font-medium">Notas finales</span>
-                </CardDescription>
-                <CardDescription class="text-center text-base mt-2">
-                    Complete la información requerida para registrar su solicitud
-                </CardDescription>
+                </CardDescription> -->
             </CardHeader>
+            <CardDescription v-if="currentStep === 1"
+                class="mx-6 rounded-md bg-[#FEF9C3] text-[#DD3426] text-base py-2 px-4 text-center">
+                Ingrese los nombres y apellidos tal como aparecen en el DPI
+            </CardDescription>
+
             <CardContent>
                 <form class="grid gap-6" @submit.prevent>
                     <!-- VALIDACION PASO 1 -->
@@ -145,7 +154,6 @@ const confirmarEnvio = async () => {
                                     {{ store.errors.email[0] }}
                                 </p>
                             </div>
-
                             <div class="grid gap-2">
                                 <Label for="telefono" class="font-semibold text-gray-700">
                                     Télefono
@@ -180,8 +188,6 @@ const confirmarEnvio = async () => {
                                 {{ store.errors.domicilio[0] }}
                             </p>
                         </div>
-
-
                         <div class="grid gap-2">
                             <Label for="zona" class="font-semibold text-gray-700">
                                 Zona
@@ -202,30 +208,23 @@ const confirmarEnvio = async () => {
                                 {{ store.errors.zona[0] }}
                             </p>
                         </div>
-
                     </div>
                     <!-- VALIDACION PASO 2 -->
                     <div v-if="currentStep === 2" class="grid gap-6">
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div class="grid gap-2">
-                                <Label>
-                                    Razón
-                                </Label>
-                                <Textarea v-model="store.form.razon" placeholder="Razón de la solicitud" />
-                                <p v-if="store.errors?.razon" class="text-sm text-red-500 mt-1">
-                                    {{ store.errors.razon[0] }}
-                                </p>
-                            </div>
+                        <div>
                             <div class="grid gap-2">
                                 <Label for="tramite_id" class="font-semibold text-gray-700">
                                     Tipo de Trámite
                                 </Label>
-                                <Select v-model="store.form.tramite_id">
-                                    <SelectTrigger class="w-full">
-                                        <SelectValue placeholder="Seleccione el trámite" />
+                                <Select v-model="store.form.tramite_id" @update:model-value="store.form.razon = ''">
+                                    <SelectTrigger class="w-full overflow-hidden">
+                                        <SelectValue placeholder="Seleccione un trámite" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
+                                            <SelectItem value="0">
+                                                Seleccione un trámite
+                                            </SelectItem>
                                             <SelectItem v-for="tramite in store.tramites" :key="tramite.id"
                                                 :value="String(tramite.id)">
                                                 {{ tramite.nombre }}
@@ -235,6 +234,17 @@ const confirmarEnvio = async () => {
                                 </Select>
                                 <p v-if="store.errors?.tramite_id" class="text-sm text-red-500 mt-1">
                                     {{ store.errors.tramite_id[0] }}
+                                </p>
+                            </div>
+
+                            <div v-if="store.form.tramite_id" class="grid gap-2 mt-4">
+                                <Label>
+                                    {{ tituloRazon }}
+                                </Label>
+
+                                <Textarea v-model="store.form.razon" :placeholder="placeholderRazon" />
+                                <p v-if="store.errors?.razon" class="text-sm text-red-500 mt-1">
+                                    {{ store.errors.razon[0] }}
                                 </p>
                             </div>
                         </div>
@@ -250,26 +260,19 @@ const confirmarEnvio = async () => {
                     </div>
 
                     <div class="flex justify-between items-center mt-4 pt-4 border-t">
-                        <Button type="button" variant="outline" @click="regresarPaso" :disabled="currentStep === 1 || store.loading">
+                        <Button type="button" variant="outline" @click="regresarPaso"
+                            :disabled="currentStep === 1 || store.loading">
                             Anterior
                         </Button>
-                        <Button v-if="currentStep < 3" type="button" @click="irAlSiguientePaso" :disabled="store.loading" class="bg-[#032C8F] hover:bg-[#021F66]">
+                        <Button v-if="currentStep < 3" type="button" @click="irAlSiguientePaso"
+                            :disabled="store.loading" class="bg-[#000000] hover:bg-[#252525]">
                             {{ store.loading ? 'Validando...' : 'Siguiente' }}
                         </Button>
-                        <Button v-else type="button" @click="openConfirm = true" :disabled="store.loading" class="bg-green-600 hover:bg-green-700">
+                        <Button v-else type="button" @click="openConfirm = true" :disabled="store.loading"
+                            class="bg-[#000000] hover:bg-[#252525]">
                             Enviar Solicitud
                         </Button>
                     </div>
-                    <!-- botones del formulario para navegar -->
-
-
-                    <!-- <Button type="button" @click="openConfirm = true" :disabled="store.loading">
-                        {{
-                            store.loading
-                                ? 'Enviando...'
-                                : 'Enviar Solicitud'
-                        }}
-                    </Button> -->
                 </form>
             </CardContent>
         </Card>
