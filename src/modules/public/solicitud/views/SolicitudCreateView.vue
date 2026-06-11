@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useSolicitudStore } from '../stores/solicitudStore'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -84,6 +84,31 @@ const confirmarEnvio = async () => {
         console.error(error)
     }
 }
+// computed que obtiene automaticamente el tramite seleccionado
+// cada vez que cambia store.form.tramite_id
+const tramiteSeleccionado = computed(() => {
+    // busca adentro del arreglo store.tramites
+    // el trámite cuyo id coincida con el seleccionado en el formulario
+    return store.tramites.find(
+        tramite => String(tramite.id) === String(store.form.tramite_id)
+    )
+})
+// observa cambios en tramite_id
+watch(
+    // propiedad que se va a observar
+    () => store.form.tramite_id,
+    // se ejecuta cada vez que cambia el trámite seleccionado
+    (nuevoValor) => {
+        // busca trámite completo dentro del arreglo
+        const tramite = store.tramites.find(
+            t => String(t.id) === String(nuevoValor)
+        )
+        // muestra consola objeto completo de tramite
+        console.log('Tramite seleccionado: ', tramite)
+        // muestra arreglo de requisitos asociados
+        console.log('Requisitos: ', tramite?.requisitos)
+    }
+)
 </script>
 <template>
     <div>
@@ -256,7 +281,19 @@ const confirmarEnvio = async () => {
                                     class="mx-6 rounded-md bg-[#EFF6FF] text-[#030EA7] text-base py-2 px-4 text-center">
                                     Recuerde que puede subir únicamente documentos PDF o JPG
                                 </CardDescription>
-                                
+                                <!-- Se muestra cuando existe trámite seleccionado y el trámite tiene un requisito -->
+                                <div
+                                v-if="tramiteSeleccionado?.requisitos?.length"
+                                class="mt-4 space-y-2">
+                                <!-- Recorre arreglo de requisito de trámite seleccionado y genera bloque por cada requisito -->
+                                <div
+                                v-for="requisito in tramiteSeleccionado.requisitos"
+                                :key="requisito.id"
+                                class="p-3 border rounded-md bg-gray-50">
+                                <!-- nombre de requisito -->
+                                {{ requisito.nombre }}
+                                </div>
+                                </div>
                             </div>
                         </div>
                     </div>
