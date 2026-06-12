@@ -45,7 +45,14 @@ const placeholderRazon = computed(() => {
             return 'Solicitud de actualización de datos'
     }
 })
-const store = useSolicitudStore()
+const store = useSolicitudStore();
+const guardarArchivo = (event, requisitoId) => {
+    const archivo = event.target.files[0]
+    console.log('archivo seleccionado', archivo)
+    store.archivos[`requisito_${requisitoId}`] = archivo
+    console.log('store.archivos', store.archivos)
+
+}
 // nuevo paso
 const currentStep = ref(1)
 // DISPARAMOS EL LLAMADO A LA API AL MONTAR EL COMPONENTE
@@ -235,7 +242,7 @@ watch(
                         </div>
                     </div>
                     <!-- VALIDACION PASO 2 -->
-                    <div v-if="currentStep === 1" class="grid gap-6">
+                    <div v-if="currentStep === 2" class="grid gap-6">
                         <div>
                             <div class="grid gap-2">
                                 <Label for="tramite_id" class="font-semibold text-gray-700">
@@ -290,8 +297,19 @@ watch(
                                 v-for="requisito in tramiteSeleccionado.requisitos"
                                 :key="requisito.id"
                                 class="p-3 border rounded-md bg-gray-50">
+                                <Label>
+                                    {{ requisito.nombre }}
+                                </Label>
                                 <!-- nombre de requisito -->
-                                {{ requisito.nombre }}
+                                <Input 
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                @change="guardarArchivo($event, requisito.id)"/>
+                                <p
+                                v-if="store.errors?.[`requisito_${requisito.id}`]"
+                                class="text-sm text-red-500 mt-1">
+                                {{ store.errors[`requisito_${requisito.id}`][0] }}
+                                </p>
                                 </div>
                                 </div>
                             </div>

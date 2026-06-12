@@ -13,10 +13,15 @@ export default {
     },
     async create(data){
         try {
-            const response = await apiClient.post('/solicitudes', data);
+            // const response = await apiClient.post('/solicitudes', data);
+            const response = await apiClient.post('/solicitudes', data, {
+                headers: {
+                     'Content-Type': 'multipart/form-data'
+                }
+            });
             return response.data;
         } catch(error) {
-            console.log(error.response.data);
+            console.log("Errores del Backend al Guardar:", error.response?.data);
             throw error;
         }
     },
@@ -28,7 +33,16 @@ export default {
 
     async validarPaso(data){
         try {
-            const response = await apiClient.post('/solicitudes/validar-paso', data);
+            const response = await apiClient.post(
+                '/solicitudes/validar-paso',
+                data,
+                {
+                    // 🚀 AQUÍ ESTÁ EL TRUCO: Sobreescribimos el JSON global
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
             return response.data;
         } catch(error){
             console.error('Error en validarPaso:', error.response?.data || error.message)
