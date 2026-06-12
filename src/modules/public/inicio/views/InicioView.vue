@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
         <div class="mt-5 w-full max-w-5xl">
             <CardHeader>
                 <img :src="iconoMunicipalidad" class="mx-auto h-30 w-auto mb-4">
-
                 <CardTitle class="text-2xl text-center font-bold text-[#000000]">
                     Sistema de Constancia de Residencia
                 </CardTitle>
@@ -18,11 +17,7 @@ import { Button } from '@/components/ui/button'
                 </CardDescription>
             </CardHeader>
         </div>
-
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mt-8 px-4">
-
-
             <router-link to="/solicitud" class="block group no-underline">
                 <Card
                     class="h-full border-t-4 border-[#83BD3F] hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
@@ -63,7 +58,6 @@ import { Button } from '@/components/ui/button'
                     </CardContent>
                 </Card>
             </router-link>
-
             <router-link to="" class="block group no-underline">
                 <Card
                     class="h-full border-t-4 border-t-gray-800 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
@@ -79,16 +73,9 @@ import { Button } from '@/components/ui/button'
                             Acceda al sistema para administrar solicitudes, asignar visitas de campo, control de
                             estados, autorización y emisión de constancias de residencia.
                         </p>
-                        
                     </CardContent>
                 </Card>
             </router-link>
-
-
         </div>
-
     </div>
-
-
-
 </template>
