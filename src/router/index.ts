@@ -39,6 +39,18 @@ const router = createRouter({
                 import('@/modules/public/solicitud/views/SolicitudCreateView.vue')
         }
       ]
+    },
+    {
+      path: '/inicio',
+      component: () => import('@/layouts/public/SolicitudLayout.vue'),
+      children: [
+        {
+          path: '',
+          name: 'inicio',
+          component: () =>
+            import('@/modules/public/inicio/views/InicioView.vue')
+        }
+      ]
     }
     
   ],
