@@ -39,7 +39,7 @@ import { Button } from '@/components/ui/button'
                     </CardContent>
                 </Card>
             </router-link>
-            <router-link to="" class="block group no-underline">
+            <router-link to="/consulta" class="block group no-underline">
                 <Card class="h-full border-t-4 border-t-[#032C8F] hover:shadow-xl transition-all">
                     <CardHeader class="text-center pb-2">
                         <div

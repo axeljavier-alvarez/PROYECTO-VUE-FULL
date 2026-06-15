@@ -41,6 +41,18 @@ const router = createRouter({
       ]
     },
     {
+      path: '/consulta',
+      component: () => import('@/layouts/public/SolicitudLayout.vue'),
+      children: [
+        {
+            path: '',
+            name: 'consulta',
+            component: () =>
+                import('@/modules/public/consulta/views/ConsultaView.vue')
+        }
+      ]
+    },
+    {
       path: '/inicio',
       component: () => import('@/layouts/public/SolicitudLayout.vue'),
       children: [

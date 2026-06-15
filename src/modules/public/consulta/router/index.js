@@ -4,7 +4,7 @@ const routes = [
         path: '/consulta',
         name: 'consulta',
         component: () =>
-            import('../views/ConsultaCreateView.vue')
+            import('../views/ConsultaView.vue')
     }  
 ];
 export default routes; 
