@@ -1,5 +1,5 @@
 
 
 <template>
-Hola desde Dashboard.vue
+Estados de las solicitudes
 </template>

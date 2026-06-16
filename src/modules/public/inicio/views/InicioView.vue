@@ -58,7 +58,7 @@ import { Button } from '@/components/ui/button'
                     </CardContent>
                 </Card>
             </router-link>
-            <router-link to="" class="block group no-underline">
+            <router-link to="/auth/login" class="block group no-underline">
                 <Card
                     class="h-full border-t-4 border-t-gray-800 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between">
                     <CardHeader class="text-center pb-2">

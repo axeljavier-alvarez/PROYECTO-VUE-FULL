@@ -22,25 +22,40 @@ const errors = ref([
 
 const isLoading = ref(false); 
 
-async function handleLogin() {
+// async function handleLogin() {
 
+//     errors.value = [];
+//     try {
+//         isLoading.value = true;
+//         await authStore.login(credentials);
+//         router.push('/');
+//     } catch (error) {
+
+//         const responseErrors = error.errors;
+//         // console.log(responseErrors);
+//         for (const field in responseErrors) {
+//             // console.log(field);
+//             errors.value.push(
+//                 responseErrors[field][0]
+//             );
+//         }
+
+//         // console.log(errors.value)
+//     } finally {
+//         isLoading.value = false;
+//     }
+// }
+async function handleLogin(){
     errors.value = [];
     try {
         isLoading.value = true;
         await authStore.login(credentials);
-        router.push('/');
+        router.push({ name: 'admin.dashboard' })
     } catch (error) {
-
         const responseErrors = error.errors;
-        // console.log(responseErrors);
-        for (const field in responseErrors) {
-            // console.log(field);
-            errors.value.push(
-                responseErrors[field][0]
-            );
+        for(const field in responseErrors){
+            errors.value.push(responseErrors[field][0]);
         }
-
-        // console.log(errors.value)
     } finally {
         isLoading.value = false;
     }
