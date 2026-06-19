@@ -107,27 +107,54 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
-         <div v-if="selectedSolicitud"
-         class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-         @click.self="selectedSolicitud = null">
-         <div class="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
-             <h2 class="text-lg font-bold mb-4">
-               Revisión de solicitud #{{ selectedSolicitud.no_solicitud }}
-            </h2>
-             <p><b>Nombre:</b> {{ selectedSolicitud.nombres }} {{ selectedSolicitud.apellidos }}</p>
-             <p><b>CUI:</b> {{ selectedSolicitud.cui }}</p>
-             <p><b>Teléfono:</b> {{ selectedSolicitud.telefono }}</p>
-             <p><b>Domicilio:</b> {{ selectedSolicitud.domicilio }}</p>
-             <p><b>Zona:</b> {{ selectedSolicitud.zona }}</p>
-             <p><b>Trámite</b> {{ selectedSolicitud.tramite?.nombre }}</p>
-             <p><b>Observaciones</b> {{ selectedSolicitud.observaciones }}</p>
-             <div class="mt-6 flex justify-end gap-2">
-               <Button @click="selectedSolicitud = null" variant="outline">
-                  Aceptar
-               </Button>
-             </div>
+         <div v-if="selectedSolicitud" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            @click.self="selectedSolicitud = null">
+            <div class="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
+               <h2 class="text-lg font-bold mb-4">
+                  Revisión de solicitud #{{ selectedSolicitud.no_solicitud }}
+               </h2>
+               <p><b>Nombre:</b> {{ selectedSolicitud.nombres }} {{ selectedSolicitud.apellidos }}</p>
+               <p><b>CUI:</b> {{ selectedSolicitud.cui }}</p>
+               <p><b>Teléfono:</b> {{ selectedSolicitud.telefono }}</p>
+               <p><b>Domicilio:</b> {{ selectedSolicitud.domicilio }}</p>
+               <p><b>Zona:</b> {{ selectedSolicitud.zona }}</p>
+               <p><b>Trámite</b> {{ selectedSolicitud.tramite?.nombre }}</p>
+               <p><b>Observaciones</b> {{ selectedSolicitud.observaciones }}</p>
+
+               <div class="mt-6">
+                  <h3 class="font-bold mb-2">Bitácora</h3>
+
+                  <div v-if="selectedSolicitud?.bitacoras?.length">
+                     <ul class="space-y-2">
+                        <li v-for="bit in selectedSolicitud?.bitacoras" :key="bit.id" class="border-l-2 pl-3">
+                           <p class="text-sm font-semibold">
+                              {{ bit.evento }}
+                           </p>
+
+                           <p class="text-sm">
+                              {{ bit.descripcion }}
+                           </p>
+
+                           <p class="text-xs text-gray-500">
+                              {{ bit.usuario ?? 'Sistema' }} - {{ bit.created_at }}
+                           </p>
+                        </li>
+                     </ul>
+                  </div>
+
+                  <p v-else class="text-sm text-gray-500">
+                     Sin historial de movimientos
+                  </p>
+               </div>
+
+               <div class="mt-6 flex justify-end gap-2">
+                  <Button @click="selectedSolicitud = null" variant="outline">
+                     Aceptar
+                  </Button>
+               </div>
+            </div>
          </div>
-         </div>
+
       </CardContent>
    </Card>
 </template>
