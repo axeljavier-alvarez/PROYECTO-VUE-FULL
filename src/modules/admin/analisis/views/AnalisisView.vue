@@ -116,7 +116,24 @@ onMounted(async () => {
                <p><b>Zona:</b> {{ selectedSolicitud.zona }}</p>
                <p><b>Trámite</b> {{ selectedSolicitud.tramite?.nombre }}</p>
                <p><b>Observaciones</b> {{ selectedSolicitud.observaciones }}</p>
-
+               <div class="mt-6">
+                  <h3 class="font-bold mb-2">
+                     Documentos adjuntos
+                  </h3>
+                  <div v-if="selectedSolicitud?.documentos?.length" class="space-y-2">
+                     <div v-for="doc in selectedSolicitud.documentos" :key="doc.id" class="border rounded p-3">
+                        <p class="font-medium">
+                           {{ doc.requisito?.nombre }}
+                        </p>
+                        <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank" class="text-blue-600 hover:underline">
+                           Ver documento
+                        </a>
+                     </div>
+                  </div>
+                  <p v-else class="text-sm text-gray-500">
+                     No hay documentos adjuntos
+                  </p>
+               </div>
                <div class="mt-6">
                   <h3 class="font-bold mb-2">Bitácora</h3>
 

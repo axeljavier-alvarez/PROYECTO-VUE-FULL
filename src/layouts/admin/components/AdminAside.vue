@@ -1,4 +1,9 @@
 <script setup>
+import {
+    LayoutDashboard,
+    FileText,
+    FileSearch
+} from 'lucide-vue-next';
 import AdminNav from './AdminNav.vue';
 import AdminNavLink from './AdminNavLink.vue';
 const openSidebar = defineModel();
@@ -19,9 +24,7 @@ const openSidebar = defineModel();
                     <AdminNavLink :to="{
                         name: 'admin.dashboard'
                     }">
-                        <span class="inline-flex w-6 h-6 justify-center items-center">
-                            <i class="fa-solid fa-gauge-high"></i>
-                        </span>
+                        <LayoutDashboard class="w-5 h-5" />
                         <span class="ms-3">Dashboard</span>
                     </AdminNavLink>
 
@@ -30,9 +33,7 @@ const openSidebar = defineModel();
                     <AdminNavLink :to="{
                         name: 'admin.solicitudes'
                     }">
-                        <span class="inline-flex w-6 h-6 justify-center items-center">
-                            <i class="fa-solid fa-gauge-high"></i>
-                        </span>
+                            <FileText class="w-5 h-5" />
                         <span class="ms-3">Solicitudes</span>
                     </AdminNavLink>
                 </li>
@@ -40,9 +41,8 @@ const openSidebar = defineModel();
                     <AdminNavLink :to="{
                         name: 'admin.analisis'
                     }">
-                        <span class="inline-flex w-6 h-6 justify-center items-center">
-                            <i class="fa-solid fa-gauge-high"></i>
-                        </span>
+                            <FileSearch class="w-5 h-5" />
+
                         <span>Analisis de documentos</span>
                     </AdminNavLink>
                 </li>
