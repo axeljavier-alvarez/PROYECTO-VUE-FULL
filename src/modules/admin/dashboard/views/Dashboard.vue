@@ -8,7 +8,16 @@ import {
     Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale
 } from 'chart.js'
 import { Bar } from 'vue-chartjs'
+import { Clock3, FileCheck, CheckCircle2, AlertCircle, XCircle} from 'lucide-vue-next'
+const estadoIcons = {
+    'Por autorizar': Clock3,
+    'Emitido': FileCheck,
+    'Autorizado': CheckCircle2,
+    'Previo': AlertCircle,
+    'Rechazado': XCircle,
+}
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+
 const dashboardStore = useDashboardStore();
 
 const {
@@ -41,9 +50,7 @@ const chartOptions = {
 }
 
 onMounted(async () => {
-    // dashboardStore.fetchEstadosDashboard();
-    // ver lo que llega en vue
-    // console.log(estados.value)
+
 
     
     await dashboardStore.fetchEstadosDashboard();
@@ -53,30 +60,17 @@ onMounted(async () => {
 </script>
 
 <template>
-    <!-- <div v-if="loading">
-        Cargando...
-    </div>
-    <div v-else>
-        <div
-            v-for="estado in estados"
-            :key="estado.id"
-        >
-            <h3>{{ estado.nombre }}</h3>
-            <p>{{ estado.total_solicitudes }}</p>
-        </div>
-        <div
-        v-for="tramite in tramites"
-        :key="tramite.id">
-        <h3>{{ tramite.nombre }}</h3>
-        <p>{{ tramite.total_solicitudes }}</p>
-        </div>
-    </div> -->
+    
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card v-for="estado in estados" :key="estado.id">
-            <CardHeader>
+            <CardHeader  class="flex flex-row items-center justify-between">
                 <CardTitle class="text-sm text-muted-foreground">
                     {{ estado.nombre }}
                 </CardTitle>
+                 <component
+            :is="estadoIcons[estado.nombre]"
+            class="h-5 w-5 text-muted-foreground"
+        />
             </CardHeader>
             <CardContent>
                 <div class="text-3xl font-bold">
