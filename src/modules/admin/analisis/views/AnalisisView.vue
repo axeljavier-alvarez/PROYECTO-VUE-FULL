@@ -160,11 +160,43 @@ onMounted(async () => {
                   </p>
                </div>
 
-               <div class="mt-6 flex justify-end gap-2">
-                  <Button @click="selectedSolicitud = null" variant="outline">
-                     Aceptar
+              <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <Button 
+                     variant="destructive" 
+                     class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                     @click="console.log('Rechazar')"
+                  >
+                     <span class="text-sm">×</span>
+                     Rechazar Solicitud
+                  </Button>
+
+                  <Button 
+                     variant="outline" 
+                     class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                     @click="console.log('Inspección')"
+                  >
+                     <span class="text-xs">🔍</span>
+                     Inspección de Campo
+                  </Button>
+
+                  <Button 
+                     variant="outline" 
+                     class="w-full border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                     @click="console.log('Previo')"
+                  >
+                     <span class="text-xs">⚠️</span>
+                     Enviar a Previo
+                  </Button>
+
+                  <Button 
+                     class="w-full bg-blue-900 hover:bg-blue-850 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                     @click="console.log('Autorizar')"
+                  >
+                     <span class="text-xs">📄</span>
+                     Enviar a Autorizar
                   </Button>
                </div>
+               
             </div>
          </div>
       </CardContent>
