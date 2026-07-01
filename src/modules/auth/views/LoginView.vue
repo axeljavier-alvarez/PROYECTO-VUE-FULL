@@ -16,7 +16,7 @@ const credentials = reactive({
     email: '',
     password: ''
 });
-
+//errores
 const errors = ref([
 ]);
 
