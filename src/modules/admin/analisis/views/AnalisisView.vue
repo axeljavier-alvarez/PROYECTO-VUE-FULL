@@ -6,6 +6,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button'
+import {
+   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { FileText, User, History, Eye, Download, File, } from 'lucide-vue-next'
+import {
+   CircleX,
+   Search,
+   TriangleAlert,
+   FileCheck
+} from 'lucide-vue-next'
 
 const analisisStore = useAnalisisStore();
 const { solicitudes, loading } = storeToRefs(analisisStore);
@@ -103,102 +114,220 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
-         <div v-if="selectedSolicitud" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            @click.self="selectedSolicitud = null">
-            <div class="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
-               <h2 class="text-lg font-bold mb-4">
-                  Revisión de solicitud #{{ selectedSolicitud.no_solicitud }}
-               </h2>
-               <p><b>Nombre:</b> {{ selectedSolicitud.nombres }} {{ selectedSolicitud.apellidos }}</p>
-               <p><b>CUI:</b> {{ selectedSolicitud.cui }}</p>
-               <p><b>Teléfono:</b> {{ selectedSolicitud.telefono }}</p>
-               <p><b>Domicilio:</b> {{ selectedSolicitud.domicilio }}</p>
-               <p><b>Zona:</b> {{ selectedSolicitud.zona }}</p>
-               <p><b>Trámite</b> {{ selectedSolicitud.tramite?.nombre }}</p>
-               <p><b>Observaciones</b> {{ selectedSolicitud.observaciones }}</p>
-               <div class="mt-6">
-                  <h3 class="font-bold mb-2">
-                     Documentos adjuntos
-                  </h3>
-                  <div v-if="selectedSolicitud?.documentos?.length" class="space-y-2">
-                     <div v-for="doc in selectedSolicitud.documentos" :key="doc.id" class="border rounded p-3">
-                        <p class="font-medium">
-                           {{ doc.requisito?.nombre }}
+         <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
+            <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
+
+               <!-- Encabezado -->
+               <div class="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
+                  <div class="flex items-center gap-3">
+                     <div class="bg-white/20 p-2 rounded-lg">
+                        <FileText class="w-6 h-6" />
+                     </div>
+
+                     <div>
+                        <DialogHeader class="border-b p-4">
+                           <DialogTitle class="text-lg font-bold">
+                              Detalles de la Solicitud
+                           </DialogTitle>
+                        </DialogHeader>
+                        <p class="text-sm text-blue-100">
+                           No. {{ selectedSolicitud?.no_solicitud }}
                         </p>
-                        <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank" class="text-blue-600 hover:underline">
-                           Ver documento
-                        </a>
                      </div>
                   </div>
-                  <p v-else class="text-sm text-gray-500">
-                     No hay documentos adjuntos
-                  </p>
+
                </div>
-               <div class="mt-6">
-                  <h3 class="font-bold mb-2">Bitácora</h3>
 
-                  <div v-if="selectedSolicitud?.bitacoras?.length">
-                     <ul class="space-y-2">
-                        <li v-for="bit in selectedSolicitud?.bitacoras" :key="bit.id" class="border-l-2 pl-3">
-                           <p class="text-sm font-semibold">
-                              {{ bit.evento }}
-                           </p>
+               <!-- Contenido con scroll -->
+               <div class="flex-1 overflow-y-auto p-6">
 
-                           <p class="text-sm">
-                              {{ bit.descripcion }}
-                           </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                           <p class="text-xs text-gray-500">
-                              {{ bit.usuario ?? 'Sistema' }} - {{ bit.created_at }}
-                           </p>
-                        </li>
-                     </ul>
+                     <!-- Información -->
+                     <div class="space-y-4">
+
+                        <div
+                           class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
+                           <User class="w-4 h-4 text-blue-600" />
+                           <span>Información del Solicitante</span>
+                        </div>
+
+                        <div class="border rounded-lg p-3 bg-gray-50">
+                           <label class="text-xs text-gray-400">
+                              NOMBRE COMPLETO
+                           </label>
+
+                           <div class="font-medium">
+                              {{ selectedSolicitud?.nombres }}
+                              {{ selectedSolicitud?.apellidos }}
+                           </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+
+                           <div class="border rounded-lg p-3 bg-gray-50">
+                              <label class="text-xs text-gray-400">
+                                 DPI / CUI
+                              </label>
+
+                              <div class="font-medium">
+                                 {{ selectedSolicitud?.cui }}
+                              </div>
+                           </div>
+
+                           <div class="border rounded-lg p-3 bg-gray-50">
+                              <label class="text-xs text-gray-400">
+                                 TELÉFONO
+                              </label>
+
+                              <div class="font-medium">
+                                 {{ selectedSolicitud?.telefono }}
+                              </div>
+                           </div>
+
+                        </div>
+
+                        <div class="border rounded-lg p-3 bg-gray-50">
+                           <label class="text-xs text-gray-400">
+                              DOMICILIO / ZONA
+                           </label>
+
+                           <div class="font-medium">
+                              {{ selectedSolicitud?.domicilio }}
+                              -
+                              {{ selectedSolicitud?.zona }}
+                           </div>
+                        </div>
+                        <div class="border rounded-lg p-3 bg-gray-50">
+                           <label class="text-xs text-gray-400">
+                              TRÁMITE
+                           </label>
+                           <div class="mt-2">
+                              <Badge variant="secondary">
+                                 {{ selectedSolicitud?.tramite?.nombre }}
+                              </Badge>
+                           </div>
+                        </div>
+                     </div>
+                     <!-- Historial -->
+                     <div class="space-y-4">
+                        <div
+                           class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
+                           <History class="w-4 h-4 text-blue-600" />
+                           <span>Historial de Movimientos</span>
+                        </div>
+                        <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
+                           <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
+                              class="border-l-2 border-blue-500 pl-4">
+                              <div class="font-bold text-sm">
+                                 {{ bit.evento }}
+                              </div>
+
+                              <div class="text-sm text-gray-600">
+                                 {{ bit.descripcion }}
+                              </div>
+
+                              <div class="text-xs text-gray-500 mt-1">
+                                 {{ bit.usuario ?? 'Sistema' }}
+                              </div>
+
+                              <div class="text-xs text-gray-400">
+                                 {{ bit.created_at }}
+                              </div>
+                           </div>
+                        </div>
+                        <div v-else class="text-sm text-gray-500">
+                           Sin historial de movimientos.
+                        </div>
+                     </div>
+
                   </div>
 
-                  <p v-else class="text-sm text-gray-500">
-                     Sin historial de movimientos
-                  </p>
+                  <div class="mt-4 border rounded-lg p-3 bg-gray-50">
+                     <label class="text-xs text-gray-400">
+                        Observaciones
+                     </label>
+                     <div class="font-medium">
+                        {{ selectedSolicitud?.observaciones }}
+                     </div>
+                  </div>
+
+                  <div class="mt-6">
+                     <div class="flex items-center gap-2 mb-4">
+                        <FileText class="w-5 h-5 text-blue-600" />
+                        <h3 class="font-bold">
+                           Documentos Adjuntos
+                        </h3>
+                     </div>
+
+                     <div v-if="selectedSolicitud?.documentos?.length"
+                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div v-for="doc in selectedSolicitud.documentos" :key="doc.id"
+                           class="border rounded-lg p-4 bg-gray-50 hover:shadow transition">
+                           <div class="flex items-center justify-between">
+
+                              <div class="flex items-center gap-2 min-w-0">
+                                 <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank"
+                                    class="text-blue-600 hover:text-blue-800" title="Ver documento">
+                                    <Eye class="w-5 h-5" />
+                                 </a>
+
+                                 <span class="font-medium truncate">
+                                    {{ doc.requisito?.nombre }}
+                                 </span>
+
+                                 <a :href="`http://127.0.0.1:8000/storage/${doc.path}`"
+                                    :download="doc.requisito?.nombre" class="text-green-600 hover:text-green-800"
+                                    title="Descargar">
+                                    <Download class="w-5 h-5" />
+                                 </a>
+
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <p v-else class="text-sm text-gray-500">
+                        No hay documentos adjuntos.
+                     </p>
+                  </div>
+                  <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+                     <Button variant="destructive"
+                        class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        @click="console.log('Rechazar')">
+                        <CircleX class="w-4 h-4" />
+                        Rechazar Solicitud
+                     </Button>
+                     <Button variant="outline"
+                        class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        @click="console.log('Inspección')">
+                        <Search class="w-4 h-4" />
+                        Inspección de Campo
+                     </Button>
+                     <Button variant="outline"
+                        class="w-full border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        @click="console.log('Previo')">
+                        <TriangleAlert class="w-4 h-4" />
+                        Enviar a Previo
+                     </Button>
+                     <Button
+                        class="w-full bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        @click="console.log('Autorizar')">
+                        <FileCheck class="w-4 h-4" />
+                        Enviar a Autorizar
+                     </Button>
+                  </div>
                </div>
-
-              <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <Button 
-                     variant="destructive" 
-                     class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                     @click="console.log('Rechazar')"
-                  >
-                     <span class="text-sm">×</span>
-                     Rechazar Solicitud
-                  </Button>
-
-                  <Button 
-                     variant="outline" 
-                     class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                     @click="console.log('Inspección')"
-                  >
-                     <span class="text-xs">🔍</span>
-                     Inspección de Campo
-                  </Button>
-
-                  <Button 
-                     variant="outline" 
-                     class="w-full border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                     @click="console.log('Previo')"
-                  >
-                     <span class="text-xs">⚠️</span>
-                     Enviar a Previo
-                  </Button>
-
-                  <Button 
-                     class="w-full bg-blue-900 hover:bg-blue-850 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                     @click="console.log('Autorizar')"
-                  >
-                     <span class="text-xs">📄</span>
-                     Enviar a Autorizar
-                  </Button>
+               <!-- Footer -->
+               <div class="border-t p-4 flex justify-end shrink-0">
+                  <DialogClose as-child>
+                     <Button class="bg-green-600 hover:bg-green-700">
+                        Aceptar
+                     </Button>
+                  </DialogClose>
                </div>
-               
-            </div>
-         </div>
+            </DialogContent>
+         </Dialog>
       </CardContent>
    </Card>
 </template>
