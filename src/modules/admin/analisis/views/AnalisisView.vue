@@ -22,10 +22,47 @@ const analisisStore = useAnalisisStore();
 const { solicitudes, loading } = storeToRefs(analisisStore);
 const search = ref('');
 const selectedSolicitud = ref(null);
+// confirmar dialog
+const confirmDialog = ref(false);
+const accionSeleccionada = ref({
+   estadoId: null,
+   titulo: '',
+   mensaje: ''
+});
+
 function verSolicitud(solicitud) {
    console.log(solicitud);
    selectedSolicitud.value = solicitud;
 }
+
+// funcion para abrir modal
+function confirmarCambioEstado(estadoId, titulo, mensaje) {
+   accionSeleccionada.value = {
+      estadoId,
+      titulo,
+      mensaje
+   };
+   confirmDialog.value = true;
+}
+
+// actualizar estado
+async function actualizarEstado(estadoId) {
+   try {
+      await analisisStore.cambiarEstado(
+         selectedSolicitud.value.id,
+         accionSeleccionada.value.estadoId
+      );
+
+      confirmDialog.value = false;
+      await analisisStore.fetchSolicitudes();
+
+      selectedSolicitud.value = null;
+
+   } catch (error) {
+      console.error(error);
+   }
+}
+
 const filteredSolicitudes = computed(() => {
    if (!search.value) {
       return solicitudes.value;
@@ -191,7 +228,6 @@ onMounted(async () => {
                            <label class="text-xs text-gray-400">
                               DOMICILIO / ZONA
                            </label>
-
                            <div class="font-medium">
                               {{ selectedSolicitud?.domicilio }}
                               -
@@ -216,33 +252,31 @@ onMounted(async () => {
                            <History class="w-4 h-4 text-blue-600" />
                            <span>Historial de Movimientos</span>
                         </div>
-                        <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
-                           <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
-                              class="border-l-2 border-blue-500 pl-4">
-                              <div class="font-bold text-sm">
-                                 {{ bit.evento }}
-                              </div>
-
-                              <div class="text-sm text-gray-600">
-                                 {{ bit.descripcion }}
-                              </div>
-
-                              <div class="text-xs text-gray-500 mt-1">
-                                 {{ bit.usuario ?? 'Sistema' }}
-                              </div>
-
-                              <div class="text-xs text-gray-400">
-                                 {{ bit.created_at }}
+                        <div class="border rounded-lg bg-gray-50 p-4 h-[350px] overflow-y-auto">
+                           <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
+                              <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
+                                 class="border-l-2 border-blue-500 pl-4">
+                                 <div class="font-bold text-sm">
+                                    {{ bit.evento }}
+                                 </div>
+                                 <div class="text-sm text-gray-600">
+                                    {{ bit.descripcion }}
+                                 </div>
+                                 <div class="text-xs text-gray-500 mt-1">
+                                    {{ bit.usuario ?? 'Sistema' }}
+                                 </div>
+                                 <div class="text-xs text-gray-400">
+                                    {{ bit.created_at }}
+                                 </div>
                               </div>
                            </div>
-                        </div>
-                        <div v-else class="text-sm text-gray-500">
-                           Sin historial de movimientos.
+
+                           <div v-else class="text-sm text-gray-500">
+                              Sin historial de movimientos.
+                           </div>
                         </div>
                      </div>
-
                   </div>
-
                   <div class="mt-4 border rounded-lg p-3 bg-gray-50">
                      <label class="text-xs text-gray-400">
                         Observaciones
@@ -294,25 +328,41 @@ onMounted(async () => {
                   <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
                      <Button variant="destructive"
                         class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                        @click="console.log('Rechazar')">
+                        @click="confirmarCambioEstado(
+                           9,
+                           'Rechazar Solicitud',
+                           '¿Está seguro de que desea rechazar esta solicitud?'
+                        )">
                         <CircleX class="w-4 h-4" />
                         Rechazar Solicitud
                      </Button>
                      <Button variant="outline"
                         class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                        @click="console.log('Inspección')">
+                        @click="confirmarCambioEstado(
+                           3,
+                           'Inspección de Campo',
+                           '¿Está seguro de que desea enviar esta solicitud para inspección de campo?'
+                        )">
                         <Search class="w-4 h-4" />
                         Inspección de Campo
                      </Button>
                      <Button variant="outline"
                         class="w-full border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                        @click="console.log('Previo')">
+                        @click="confirmarCambioEstado(
+                           8,
+                           'Enviar a Previo',
+                           '¿Está seguro de que desea enviar esta solicitud para revisión previa?'
+                        )">
                         <TriangleAlert class="w-4 h-4" />
                         Enviar a Previo
                      </Button>
                      <Button
                         class="w-full bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
-                        @click="console.log('Autorizar')">
+                        @click="confirmarCambioEstado(
+                           5,
+                           'Enviar a Autorizar',
+                           '¿Está seguro de que desea enviar esta solicitud para autorización?'
+                        )">
                         <FileCheck class="w-4 h-4" />
                         Enviar a Autorizar
                      </Button>
@@ -328,6 +378,35 @@ onMounted(async () => {
                </div>
             </DialogContent>
          </Dialog>
+
+         <Dialog :open="confirmDialog" @update:open="confirmDialog = false">
+            <DialogContent class="max-w-md">
+
+               <DialogHeader>
+                  <DialogTitle>
+                     {{ accionSeleccionada.titulo }}
+                  </DialogTitle>
+               </DialogHeader>
+
+               <p class="text-sm text-gray-600">
+                  {{ accionSeleccionada.mensaje }}
+               </p>
+
+               <DialogFooter class="mt-6">
+
+                  <Button variant="outline" @click="confirmDialog = false">
+                     Cancelar
+                  </Button>
+
+                  <Button @click="actualizarEstado">
+                     Aceptar
+                  </Button>
+
+               </DialogFooter>
+
+            </DialogContent>
+         </Dialog>
+
       </CardContent>
    </Card>
 </template>

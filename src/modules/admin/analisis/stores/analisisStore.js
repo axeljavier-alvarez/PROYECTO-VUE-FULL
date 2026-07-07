@@ -22,10 +22,19 @@ export const useAnalisisStore = defineStore(
 
             }
         }
+        async function cambiarEstado(id, estado_id){
+            const response = await analisisService.cambiarEstado(
+                id, estado_id
+            ); 
+            await fetchSolicitudes(); 
+            return response;
+        }
+        
         return {
             loading,
             solicitudes,
-            fetchSolicitudes
+            fetchSolicitudes,
+            cambiarEstado
         };
     }
 );
