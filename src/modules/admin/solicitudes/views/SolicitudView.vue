@@ -142,7 +142,8 @@ onMounted(async () => {
                      <!-- Información -->
                      <div class="space-y-4">
 
-                       <div class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
+                        <div
+                           class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
                            <User class="w-4 h-4 text-blue-600" />
                            <span>Información del Solicitante</span>
                         </div>
@@ -206,33 +207,38 @@ onMounted(async () => {
                      </div>
                      <!-- Historial -->
                      <div class="space-y-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
+                        <div
+                           class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
                            <History class="w-4 h-4 text-blue-600" />
                            <span>Historial de Movimientos</span>
                         </div>
-                        <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
-                           <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
-                              class="border-l-2 border-blue-500 pl-4">
-                              <div class="font-bold text-sm">
-                                 {{ bit.evento }}
-                              </div>
+                        <div class="border rounded-lg bg-gray-50 p-4 h-[350px] overflow-y-auto">
+                           <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
+                              <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
+                                 class="border-l-2 border-blue-500 pl-4">
+                                 <div class="font-bold text-sm">
+                                    {{ bit.evento }}
+                                 </div>
 
-                              <div class="text-sm text-gray-600">
-                                 {{ bit.descripcion }}
-                              </div>
+                                 <div class="text-sm text-gray-600">
+                                    {{ bit.descripcion }}
+                                 </div>
 
-                              <div class="text-xs text-gray-500 mt-1">
-                                 {{ bit.usuario ?? 'Sistema' }}
-                              </div>
+                                 <div class="text-xs text-gray-500 mt-1">
+                                    {{ bit.usuario ?? 'Sistema' }}
+                                 </div>
 
-                              <div class="text-xs text-gray-400">
-                                 {{ bit.created_at }}
+                                 <div class="text-xs text-gray-400">
+                                    {{ bit.created_at }}
+                                 </div>
                               </div>
                            </div>
+                           <div v-else class="text-sm text-gray-500">
+                              Sin historial de movimientos.
+                           </div>
+
                         </div>
-                        <div v-else class="text-sm text-gray-500">
-                           Sin historial de movimientos.
-                        </div>
+
                      </div>
 
                   </div>

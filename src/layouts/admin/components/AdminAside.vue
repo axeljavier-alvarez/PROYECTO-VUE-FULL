@@ -2,7 +2,8 @@
 import {
     LayoutDashboard,
     FileText,
-    FileSearch
+    FileSearch,
+    MapPinned
 } from 'lucide-vue-next';
 import AdminNav from './AdminNav.vue';
 import AdminNavLink from './AdminNavLink.vue';
@@ -43,7 +44,16 @@ const openSidebar = defineModel();
                     }">
                             <FileSearch class="w-5 h-5" />
 
-                        <span>Analisis de documentos</span>
+                        <span class="ms-3">Analisis de documentos</span>
+                    </AdminNavLink>
+                </li>
+                <li>
+                    <AdminNavLink :to="{
+                        name: 'admin.visita-campo'
+                    }">
+                            <MapPinned class="w-5 h-5" />
+
+                        <span class="ms-3">Visita de campo</span>
                     </AdminNavLink>
                 </li>
             </ul>
