@@ -1,6 +1,6 @@
 import apiClient from '@/api/axiosConfig';
 export default {
-    async getSolicitudes(params = {}){
+    async getSolicitudes(params = {}) {
         try {
             const response = await apiClient.get(
                 '/solicitudesVisitas',
@@ -8,12 +8,24 @@ export default {
             );
             console.log(response.data)
             return response.data;
-        } catch (error){
+        } catch (error) {
             console.log(
                 'Error en solicitudService:',
                 error.response?.data || error.message
             );
             throw error;
         }
+    },
+
+    async guardarVisita(id, formData) {
+        return apiClient.post(
+            `/solicitudes/${id}/visita`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
     }
 }

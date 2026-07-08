@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, Text } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useVisitaCampoStore } from '../stores/visitaCampoStore';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,7 +16,9 @@ import {
     Search,
     TriangleAlert,
     FileCheck
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
+import { Textarea } from '@/components/ui/textarea';
+
 const visitaCampoStore = useVisitaCampoStore();
 const { solicitudes, loading } = storeToRefs(visitaCampoStore);
 const search = ref('');
@@ -47,6 +49,60 @@ const filteredSolicitudes = computed(() => {
         }
     );
 });
+// variables
+const mostrarModalVisita = ref(false);
+const descripcion = ref('');
+const fotos = ref([]);
+const previews = ref([]);
+function abrirModalVisita() {
+    descripcion.value = '';
+    fotos.value = [];
+    previews.value = [];
+    mostrarModalVisita.value = true;
+}
+function cargarFotos(event) {
+    fotos.value = Array.from(event.target.files);
+    previews.value = [];
+    fotos.value.forEach(file => {
+        previews.value.push({
+            file,
+            url: URL.createObjectURL(file)
+        });
+    });
+}
+function eliminarFoto(index) {
+    fotos.value.splice(index, 1);
+    URL.revokeObjectURL(previews.value[index].url);
+    previews.value.splice(index, 1);
+}
+// guardar visita
+async function guardarVisita() {
+    const formData = new FormData();
+    formData.append(
+        'descripcion',
+        descripcion.value
+    );
+
+    fotos.value.forEach(foto => {
+        formData.append(
+            'fotos[]',
+            foto
+        );
+    });
+
+    try {
+        await visitaCampoStore.guardarVisita(
+            selectedSolicitud.value.id,
+            formData
+        );
+        mostrarModalVisita.value = false;
+        selectedSolicitud.value = null;
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
 onMounted(async () => {
     await visitaCampoStore.fetchSolicitudes();
 });
@@ -232,9 +288,68 @@ onMounted(async () => {
                                 {{ selectedSolicitud?.observaciones }}
                             </div>
                         </div>
+                        <div class="mt-2 ">
+                            <Button v-if="selectedSolicitud?.estado_id === 3" @click="abrirModalVisita">
+                                Enviar visita de campo
+                            </Button>
+
+                        </div>
+
+
                     </div>
+
                 </DialogContent>
             </Dialog>
+            <Dialog :open="mostrarModalVisita" @update:open="mostrarModalVisita = false">
+                <DialogContent class="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>
+                            Enviar visita de campo
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">
+                            Descripción (opcional)
+                        </label>
+                        <Textarea v-model="descripcion" placeholder="Escriba las observaciones de la visita..."
+                            rows="4" />
+                        <div class="mt-4">
+                            <label class="text-sm font-medium">
+                                Fotografías
+                            </label>
+                            <Input type="file" multiple accept="image/*" @change="cargarFotos" />
+                            <div v-if="previews.length" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+
+                                <div v-for="(foto, index) in previews" :key="index" class="relative">
+
+                                    <img :src="foto.url" class="h-32 w-full rounded-lg object-cover border">
+
+                                    <Button size="icon" variant="destructive" class="absolute top-2 right-2 h-7 w-7"
+                                        @click="eliminarFoto(index)">
+
+                                        <CircleX class="h-4 w-4" />
+
+                                    </Button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <Button variant="outline" @click="mostrarModalVisita = false">
+                        Cancelar
+                    </Button>
+
+                    <Button @click="guardarVisita">
+                        Guardar visita
+                    </Button>
+                </DialogContent>
+
+                    
+
+            </Dialog>
+            
         </CardContent>
     </Card>
 </template>

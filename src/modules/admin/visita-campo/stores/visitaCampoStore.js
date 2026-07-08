@@ -8,15 +8,28 @@ export const useVisitaCampoStore = defineStore(
         const loading = ref(false);
         const solicitudes = ref([]);
         // VER SOLICITUDES
-        async function fetchSolicitudes(filters = {}){
+        async function fetchSolicitudes(filters = {}) {
             loading.value = true;
             try {
                 const response =
-                await visitaCampoService.getSolicitudes(
-                    filters
-                );
+                    await visitaCampoService.getSolicitudes(
+                        filters
+                    );
                 solicitudes.value =
-                response.data.data ?? response.data ?? response;
+                    response.data.data ?? response.data ?? response;
+            } finally {
+                loading.value = false;
+            }
+        }
+
+        async function guardarVisita(id, formData) {
+            loading.value = true;
+            try {
+                await visitaCampoService.guardarVisita(
+                    id,
+                    formData
+                );
+                await fetchSolicitudes();
             } finally {
                 loading.value = false;
             }
@@ -24,8 +37,9 @@ export const useVisitaCampoStore = defineStore(
 
         return {
             loading,
-            solicitudes, 
-            fetchSolicitudes
+            solicitudes,
+            fetchSolicitudes,
+            guardarVisita
         }
     }
 );
