@@ -121,6 +121,115 @@ onMounted(async () => {
                                 <div class="bg-white/20 p-2 rounded-lg">
                                     <FileText class="w-6 h-6" />
                                 </div>
+                                <div>
+                                    <DialogHeader class="border-b p-4">
+                                        <DialogTitle class="text-lg font-bold">
+                                            Detalles de la solicitud
+                                        </DialogTitle>
+                                    </DialogHeader>
+                                    <p class="text-sm text-blue-100">
+                                        No. {{ selectedSolicitud?.no_solicitud }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- contenido con scroll -->
+                    <div class="flex-1 overflow-y-auto p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-2 text-sm text-gray-500
+                                uppercase font-semibold tracking-wider">
+                                    <User class="w-4 h-4 text-blue-600" />
+                                    <span>Información del Solicitante</span>
+                                </div>
+
+                                <div class="border rounded-lg p-3 bg-gray-50">
+                                    <label class="text-xs text-gray-400">
+                                        NOMBRE COMPLETO
+                                    </label>
+                                    <div class="font-medium">
+                                        {{ selectedSolicitud?.nombres }}
+                                        {{ selectedSolicitud?.apellidos }}
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="border rounded-lg p-3 bg-gray-50">
+                                        <label class="text-xs text-gray-400">
+                                            DPI / CUI
+                                        </label>
+                                        <div class="font-medium">
+                                            {{ selectedSolicitud?.cui }}
+                                        </div>
+                                    </div>
+                                    <div class="border rounded-lg p-3 bg-gray-50">
+                                        <label class="text-xs text-gray-400">
+                                            TELÉFONO
+                                        </label>
+                                        <div class="font-medium">
+                                            {{ selectedSolicitud?.telefono }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border rounded-lg p-3 bg-gray-50">
+                                    <label class="text-xs text-gray-400">
+                                        DOMICILIO / ZONA
+                                    </label>
+                                    <div class="font-medium">
+                                        {{ selectedSolicitud?.domicilio }}
+                                        -
+                                        {{ selectedSolicitud?.zona }}
+                                    </div>
+                                </div>
+                                <div class="border rounded-lg p-3 bg-gray-50">
+                                    <label class="text-xs text-gray-400">
+                                        TRÁMITE
+                                    </label>
+                                    <div class="mt-2">
+                                        <Badge variant="secondary">
+                                            {{ selectedSolicitud?.tramite?.nombre }}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Historial -->
+                            <div class="space-y-4">
+                                <div
+                                    class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
+                                    <History class="w-4 h-4 text-blue-600" />
+                                    <span>Historial de Movimientos</span>
+                                </div>
+                                <div class="border rounded-lg bg-gray-50 p-4 h-[350px] overflow-y-auto">
+                                    <div v-if="selectedSolicitud?.bitacoras?.length" class="space-y-4">
+                                        <div v-for="bit in selectedSolicitud.bitacoras" :key="bit.id"
+                                            class="border-l-2 border-blue-500 pl-4">
+                                            <div class="font-bold text-sm">
+                                                {{ bit.evento }}
+                                            </div>
+                                            <div class="text-sm text-gray-600">
+                                                {{ bit.descripcion }}
+                                            </div>
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                {{ bit.usuario ?? 'Sistema' }}
+                                            </div>
+                                            <div class="text-xs text-gray-400">
+                                                {{ bit.created_at }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div v-else class="text-sm text-gray-500">
+                                        Sin historial de movimientos.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 border rounded-lg p-3 bg-gray-50">
+                            <label class="text-xs text-gray-400">
+                                Observaciones
+                            </label>
+                            <div class="font-medium">
+                                {{ selectedSolicitud?.observaciones }}
                             </div>
                         </div>
                     </div>
