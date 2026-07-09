@@ -18,6 +18,12 @@ import {
     FileCheck
 } from 'lucide-vue-next';
 import { Textarea } from '@/components/ui/textarea';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger
+} from '@/components/ui/accordion';
 
 const visitaCampoStore = useVisitaCampoStore();
 const { solicitudes, loading } = storeToRefs(visitaCampoStore);
@@ -54,6 +60,10 @@ const mostrarModalVisita = ref(false);
 const descripcion = ref('');
 const fotos = ref([]);
 const previews = ref([]);
+const permitidos = [
+    'image/jpeg',
+    'image/png'
+]
 function abrirModalVisita() {
     descripcion.value = '';
     fotos.value = [];
@@ -61,35 +71,39 @@ function abrirModalVisita() {
     mostrarModalVisita.value = true;
 }
 function cargarFotos(event) {
-    fotos.value = Array.from(event.target.files);
-    previews.value = [];
-    fotos.value.forEach(file => {
+    const archivos = Array.from(event.target.files);
+    archivos.forEach(file => {
+        if (!permitidos.includes(file.type)) {
+            alert("Solo se permiten imágenes JPG y PNG");
+            return;
+        }
+        fotos.value.push(file);
         previews.value.push({
             file,
             url: URL.createObjectURL(file)
         });
     });
+    event.target.value = '';
 }
+const inputFotos = ref(null);
 function eliminarFoto(index) {
     fotos.value.splice(index, 1);
     URL.revokeObjectURL(previews.value[index].url);
     previews.value.splice(index, 1);
 }
-// guardar visita
+// guardar visita con errores
 async function guardarVisita() {
     const formData = new FormData();
     formData.append(
         'descripcion',
         descripcion.value
     );
-
     fotos.value.forEach(foto => {
         formData.append(
             'fotos[]',
             foto
         );
     });
-
     try {
         await visitaCampoStore.guardarVisita(
             selectedSolicitud.value.id,
@@ -98,16 +112,19 @@ async function guardarVisita() {
         mostrarModalVisita.value = false;
         selectedSolicitud.value = null;
     } catch (error) {
-        console.log(error);
+        if (error.response?.data?.errors) {
+            Object.values(error.response.data.errors)
+                .flat()
+                .forEach(mensaje => {
+                    alert(mensaje)
+                });
+        }
     }
-
 }
-
 onMounted(async () => {
     await visitaCampoStore.fetchSolicitudes();
 });
 </script>
-
 <template>
     <Card>
         <CardContent class="p-6">
@@ -199,7 +216,6 @@ onMounted(async () => {
                                     <User class="w-4 h-4 text-blue-600" />
                                     <span>Información del Solicitante</span>
                                 </div>
-
                                 <div class="border rounded-lg p-3 bg-gray-50">
                                     <label class="text-xs text-gray-400">
                                         NOMBRE COMPLETO
@@ -273,7 +289,6 @@ onMounted(async () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div v-else class="text-sm text-gray-500">
                                         Sin historial de movimientos.
                                     </div>
@@ -288,16 +303,41 @@ onMounted(async () => {
                                 {{ selectedSolicitud?.observaciones }}
                             </div>
                         </div>
+                        <!-- acordeon -->
+                        <div v-if="selectedSolicitud?.estado_id === 4" class="mt-4">
+                            <Accordion type="single" collapsible>
+                                <AccordionItem value="visita">
+                                    <AccordionTrigger>
+                                        Resultados de visita de campo
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        <div class="mb-4">
+                                            <label class="text-xs text-gray-500">
+                                                Descripción
+                                            </label>
+                                            <p class="mt-2">
+                                                {{ selectedSolicitud.descripcion_visita }}
+                                            </p>
+                                        </div>
+                                        <div v-if="selectedSolicitud.fotos_visita?.length"
+                                            class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                            <img v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id"
+                                                :src="foto.url" class="rounded-lg border object-cover h-40 w-full">
+
+                                        </div>
+                                        <div v-else class="text-sm text-gray-500">
+                                            No existen fotografías.
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        </div>
                         <div class="mt-2 ">
                             <Button v-if="selectedSolicitud?.estado_id === 3" @click="abrirModalVisita">
                                 Enviar visita de campo
                             </Button>
-
                         </div>
-
-
                     </div>
-
                 </DialogContent>
             </Dialog>
             <Dialog :open="mostrarModalVisita" @update:open="mostrarModalVisita = false">
@@ -317,39 +357,30 @@ onMounted(async () => {
                             <label class="text-sm font-medium">
                                 Fotografías
                             </label>
-                            <Input type="file" multiple accept="image/*" @change="cargarFotos" />
+                            <input ref="inputFotos" type="file" multiple accept=".jpg,.jpeg,.png" class="hidden"
+                                @change="cargarFotos" />
+                            <Button variant="outline" @click="inputFotos.click()">
+                                Agregar fotografías
+                            </Button>
                             <div v-if="previews.length" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-
                                 <div v-for="(foto, index) in previews" :key="index" class="relative">
-
                                     <img :src="foto.url" class="h-32 w-full rounded-lg object-cover border">
-
                                     <Button size="icon" variant="destructive" class="absolute top-2 right-2 h-7 w-7"
                                         @click="eliminarFoto(index)">
-
                                         <CircleX class="h-4 w-4" />
-
                                     </Button>
-
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                     <Button variant="outline" @click="mostrarModalVisita = false">
                         Cancelar
                     </Button>
-
                     <Button @click="guardarVisita">
                         Guardar visita
                     </Button>
                 </DialogContent>
-
-                    
-
             </Dialog>
-            
         </CardContent>
     </Card>
 </template>
