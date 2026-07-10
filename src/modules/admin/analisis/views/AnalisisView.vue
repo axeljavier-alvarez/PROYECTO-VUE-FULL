@@ -153,7 +153,6 @@ onMounted(async () => {
          </Table>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
-
                <!-- Encabezado -->
                <div class="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
                   <div class="flex items-center gap-3">
@@ -172,23 +171,17 @@ onMounted(async () => {
                         </p>
                      </div>
                   </div>
-
                </div>
-
                <!-- Contenido con scroll -->
                <div class="flex-1 overflow-y-auto p-6">
-
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                      <!-- Información -->
                      <div class="space-y-4">
-
                         <div
                            class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
                            <User class="w-4 h-4 text-blue-600" />
                            <span>Información del Solicitante</span>
                         </div>
-
                         <div class="border rounded-lg p-3 bg-gray-50">
                            <label class="text-xs text-gray-400">
                               NOMBRE COMPLETO
