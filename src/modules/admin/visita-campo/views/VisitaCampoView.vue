@@ -24,15 +24,29 @@ import {
     AccordionItem,
     AccordionTrigger
 } from '@/components/ui/accordion';
-
+// Se encarga de la gestión de solicitudes de visita de campo
 const visitaCampoStore = useVisitaCampoStore();
+// extraer propiedades reactivas de store, 
+// solicitudes: listado obtenido desde el back
+// loading: indicador de carga durante las peticiones
 const { solicitudes, loading } = storeToRefs(visitaCampoStore);
+/* texto utilizado para filtrar las solicitudes por número 
+nombre, apellido, cui, estado o trámite*/
 const search = ref('');
+// almacena la solicitud seleccionada para visualizar sus detalles dentro del modal
 const selectedSolicitud = ref(null);
+/* guarda solicitud seleccionada
+Al asignar la solicitud, el modal de detalles se abre
+automáticamente gracias al binding del component Dialog */
 function verSolicitud(solicitud) {
     console.log(solicitud);
     selectedSolicitud.value = solicitud;
 }
+/* Filtra solicitudes en tiempo real. Si el usuario no escribe
+nada en el buscador, se muestran todas las solicitudes.
+Si escribe algún texto, se busca coincidencia en:
+-Número de solicitud., nombre, apellidos, cui, estado, tramite
+*/
 const filteredSolicitudes = computed(() => {
     if (!search.value) {
         return solicitudes.value;
@@ -55,21 +69,38 @@ const filteredSolicitudes = computed(() => {
         }
     );
 });
-// variables
+// controla la apertura y cierre del modal para registrar la visita de campo.
 const mostrarModalVisita = ref(false);
+// Descripción u observaciones escritas por el visitador, campo opcional
 const descripcion = ref('');
+// almacena archivos (file) seleccionados por el user, son enviadas al back
 const fotos = ref([]);
+// almacena vistas previas imagenes, se utilizan para mostrarlas en pantalla antes de enviarlo a servidor
 const previews = ref([]);
+// MIME permitido para las fotografías
 const permitidos = [
     'image/jpeg',
     'image/png'
 ]
+/* Prepara el form para registrar una nueva visita, 
+Se limpia la descripción, fotografías seleccionadas y vistas previas
+para evitar conservar información de visita anterior
+*/
 function abrirModalVisita() {
     descripcion.value = '';
     fotos.value = [];
     previews.value = [];
     mostrarModalVisita.value = true;
 }
+/* 
+Carga las fotografias seleccionadas por el usuario
+Flujo
+1. Obtiene los archivos seleccionados,  
+2. Verificar que sean imágenes JPG o PNG
+3. Guardar archivos para enviarlos en el back
+4. Generar vista previa de cada imagen
+5. Limpiar el input para permitir volver a seleccionar el mismo archivo si es necesario
+*/
 function cargarFotos(event) {
     const archivos = Array.from(event.target.files);
     archivos.forEach(file => {
@@ -77,7 +108,9 @@ function cargarFotos(event) {
             alert("Solo se permiten imágenes JPG y PNG");
             return;
         }
+        // guardar el archivo real
         fotos.value.push(file);
+        // genera una URL temporal para mostrar la vista previa.
         previews.value.push({
             file,
             url: URL.createObjectURL(file)
@@ -85,42 +118,71 @@ function cargarFotos(event) {
     });
     event.target.value = '';
 }
+/* referencia al input de tipo file para abrir el explorador
+de archivos desde un botón personalizado */
 const inputFotos = ref(null);
+/* elimina una foto seleccionada, libera memoria utilizada por URL temporal 
+creada con URL.createObjectURL()
+*/
+
 function eliminarFoto(index) {
     fotos.value.splice(index, 1);
     URL.revokeObjectURL(previews.value[index].url);
     previews.value.splice(index, 1);
 }
-// guardar visita con errores
+/*
+Envía la información de la visita al backend
+Flujo: 1. Crea un FormData para enviar archivos.
+2. Agregar la descripción
+3. Agregar todas las fotografías
+4. Llamar al Store para registrar la visita
+5. Si el proceso es exitoso, cierra el modal y  limpia la solicitud
+6. Error validación muestra mensajes devueltos por Laravel
+ */
 async function guardarVisita() {
+    // formato para enviar archivos/imagenes
     const formData = new FormData();
+    // descripcion
     formData.append(
         'descripcion',
         descripcion.value
     );
+    // Recorrer fotografías seleccionadas
     fotos.value.forEach(foto => {
+        /* agrega cada fotografía al FormData con el nombre fotos[]
+         para que laravel lo reciba como arreglo de imagenes */
         formData.append(
             'fotos[]',
             foto
         );
     });
     try {
+        // llama acción de store de pinia para registrar visita campo
+        // se envía el id de la solicitud, form data con descripción y fotografías
         await visitaCampoStore.guardarVisita(
             selectedSolicitud.value.id,
             formData
         );
+        // se cierra modal si operación fue exitosa
         mostrarModalVisita.value = false;
+        // limpia solicitud seleccionada para cerrar, también modal de detalles
         selectedSolicitud.value = null;
     } catch (error) {
+        // errores de validación de laravel
         if (error.response?.data?.errors) {
+            // obtiene mensajes de error
             Object.values(error.response.data.errors)
+            // conviete arreglo de arreglos en uno solo
                 .flat()
+                // recorre cada mensaje y lo muestra al user
                 .forEach(mensaje => {
                     alert(mensaje)
                 });
         }
     }
 }
+/* consulta las solicitudes disponibles para vista de campo y  
+las almacena en store para mostrarlas en la tabla */
 onMounted(async () => {
     await visitaCampoStore.fetchSolicitudes();
 });
@@ -131,6 +193,7 @@ onMounted(async () => {
             <div class="mb-4">
                 <Input v-model="search" placeholder="Buscar solicitud..." />
             </div>
+            <!-- tabla principal con solicitudes pendientes de visita -->
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -185,6 +248,7 @@ onMounted(async () => {
                     </TableRow>
                 </TableBody>
             </Table>
+            <!-- visualizar la información de una solicitud -->
             <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
                 <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
                     <!-- encabezado -->
@@ -207,7 +271,7 @@ onMounted(async () => {
                             </div>
                         </div>
                     </div>
-                    <!-- contenido con scroll -->
+                    <!-- contenido con scroll, información general del solicitante -->
                     <div class="flex-1 overflow-y-auto p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-4">
@@ -303,7 +367,7 @@ onMounted(async () => {
                                 {{ selectedSolicitud?.observaciones }}
                             </div>
                         </div>
-                        <!-- acordeon -->
+                        <!-- acordeon de visita realizada -->
                         <div v-if="selectedSolicitud?.estado_id === 4" class="mt-4">
                             <Accordion type="single" collapsible>
                                 <AccordionItem value="visita">

@@ -42,7 +42,7 @@ const handleLogout = () => {
                 </div>
                 
                 <div class="flex items-center">
-                    <div class="flex items-center ms-3 relative"> <div>
+                        <div class="flex items-center ms-3 relative"> <div>
                             <button 
                                 type="button"
                                 @click="isDropdownOpen = !isDropdownOpen"
