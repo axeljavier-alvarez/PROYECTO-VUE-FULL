@@ -17,7 +17,9 @@ import {
    TriangleAlert,
    FileCheck
 } from 'lucide-vue-next'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+// instancia del store encargado de administrar las solicitudes de análisis
 const analisisStore = useAnalisisStore();
 const { solicitudes, loading } = storeToRefs(analisisStore);
 const search = ref('');
@@ -62,29 +64,31 @@ async function actualizarEstado(estadoId) {
       console.error(error);
    }
 }
-
+const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
-   if (!search.value) {
-      return solicitudes.value;
+   let resultado = solicitudes.value;
+   if (filtroEstado.value !== 'todos'){
+      resultado = resultado.filter(
+         solicitud =>
+         solicitud.estado_id === Number(filtroEstado.value)
+      );
    }
-
-   return solicitudes.value.filter(
-      solicitud => {
-         const texto =
-            `
+   if(search.value){
+      resultado = resultado.filter(solicitud => {
+         const texto = `
          ${solicitud.no_solicitud}
          ${solicitud.nombres}
          ${solicitud.apellidos}
          ${solicitud.cui}
          ${solicitud.estado?.nombre}
          ${solicitud.tramite?.nombre}
-         `
-               .toLowerCase();
+         `.toLowerCase();
          return texto.includes(
             search.value.toLowerCase()
          );
-      }
-   );
+      });
+   }
+   return resultado;
 });
 onMounted(async () => {
    await analisisStore.fetchSolicitudes();
@@ -93,8 +97,30 @@ onMounted(async () => {
 <template>
    <Card>
       <CardContent class="p-6">
-         <div class="mb-4">
+         <div class="flex gap-4 mb-4">
             <Input v-model="search" placeholder="Buscar solicitud..." />
+            <Select v-model="filtroEstado">
+               <SelectTrigger class="w-[220px]">
+                  <SelectValue placeholder="Filtrar por estado"/>
+               </SelectTrigger>
+               <SelectContent>
+                  <SelectItem value="todos">
+                     Todos
+                  </SelectItem>
+                  <SelectItem value="1">
+                     Pendiente
+                  </SelectItem>
+                  <SelectItem value="2">
+                     Analisis
+                  </SelectItem>
+                  <SelectItem value="3">
+                     Visita asignada
+                  </SelectItem>
+                  <SelectItem value="4">
+                     Visita realizada
+                  </SelectItem>
+               </SelectContent>
+            </Select>
          </div>
          <Table>
             <TableHeader>
@@ -159,7 +185,6 @@ onMounted(async () => {
                      <div class="bg-white/20 p-2 rounded-lg">
                         <FileText class="w-6 h-6" />
                      </div>
-
                      <div>
                         <DialogHeader class="border-b p-4">
                            <DialogTitle class="text-lg font-bold">
@@ -186,37 +211,29 @@ onMounted(async () => {
                            <label class="text-xs text-gray-400">
                               NOMBRE COMPLETO
                            </label>
-
                            <div class="font-medium">
                               {{ selectedSolicitud?.nombres }}
                               {{ selectedSolicitud?.apellidos }}
                            </div>
                         </div>
-
                         <div class="grid grid-cols-2 gap-2">
-
                            <div class="border rounded-lg p-3 bg-gray-50">
                               <label class="text-xs text-gray-400">
                                  DPI / CUI
                               </label>
-
                               <div class="font-medium">
                                  {{ selectedSolicitud?.cui }}
                               </div>
                            </div>
-
                            <div class="border rounded-lg p-3 bg-gray-50">
                               <label class="text-xs text-gray-400">
                                  TELÉFONO
                               </label>
-
                               <div class="font-medium">
                                  {{ selectedSolicitud?.telefono }}
                               </div>
                            </div>
-
                         </div>
-
                         <div class="border rounded-lg p-3 bg-gray-50">
                            <label class="text-xs text-gray-400">
                               DOMICILIO / ZONA
@@ -263,7 +280,6 @@ onMounted(async () => {
                                  </div>
                               </div>
                            </div>
-
                            <div v-else class="text-sm text-gray-500">
                               Sin historial de movimientos.
                            </div>
@@ -371,32 +387,24 @@ onMounted(async () => {
                </div>
             </DialogContent>
          </Dialog>
-
          <Dialog :open="confirmDialog" @update:open="confirmDialog = false">
             <DialogContent class="max-w-md">
-
                <DialogHeader>
                   <DialogTitle>
                      {{ accionSeleccionada.titulo }}
                   </DialogTitle>
                </DialogHeader>
-
                <p class="text-sm text-gray-600">
                   {{ accionSeleccionada.mensaje }}
                </p>
-
                <DialogFooter class="mt-6">
-
                   <Button variant="outline" @click="confirmDialog = false">
                      Cancelar
                   </Button>
-
                   <Button @click="actualizarEstado">
                      Aceptar
                   </Button>
-
                </DialogFooter>
-
             </DialogContent>
          </Dialog>
 

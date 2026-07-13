@@ -24,6 +24,7 @@ import {
     AccordionItem,
     AccordionTrigger
 } from '@/components/ui/accordion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // Se encarga de la gestión de solicitudes de visita de campo
 const visitaCampoStore = useVisitaCampoStore();
 // extraer propiedades reactivas de store, 
@@ -47,27 +48,32 @@ nada en el buscador, se muestran todas las solicitudes.
 Si escribe algún texto, se busca coincidencia en:
 -Número de solicitud., nombre, apellidos, cui, estado, tramite
 */
+const filtroEstado = ref('todos');
+
 const filteredSolicitudes = computed(() => {
-    if (!search.value) {
-        return solicitudes.value;
+    let resultado = solicitudes.value;
+    if (filtroEstado.value !== 'todos') {
+        resultado = resultado.filter(
+            solicitud =>
+                solicitud.estado_id === Number(filtroEstado.value)
+        );
     }
-    return solicitudes.value.filter(
-        solicitud => {
-            const texto =
-                `
-         ${solicitud.no_solicitud}
-         ${solicitud.nombres}
-         ${solicitud.apellidos}
-         ${solicitud.cui}
-         ${solicitud.estado?.nombre}
-         ${solicitud.tramite?.nombre}
-         `
-                    .toLowerCase();
+    if (search.value) {
+        resultado = resultado.filter(solicitud => {
+            const texto = `
+            ${solicitud.no_solicitud}
+            ${solicitud.nombres}
+            ${solicitud.apellidos}
+            ${solicitud.cui}
+            ${solicitud.estado?.nombre}
+            ${solicitud.tramite?.nombre}
+            `.toLowerCase();
             return texto.includes(
                 search.value.toLowerCase()
             );
-        }
-    );
+        });
+    }
+    return resultado;
 });
 // controla la apertura y cierre del modal para registrar la visita de campo.
 const mostrarModalVisita = ref(false);
@@ -172,7 +178,7 @@ async function guardarVisita() {
         if (error.response?.data?.errors) {
             // obtiene mensajes de error
             Object.values(error.response.data.errors)
-            // conviete arreglo de arreglos en uno solo
+                // conviete arreglo de arreglos en uno solo
                 .flat()
                 // recorre cada mensaje y lo muestra al user
                 .forEach(mensaje => {
@@ -186,12 +192,31 @@ las almacena en store para mostrarlas en la tabla */
 onMounted(async () => {
     await visitaCampoStore.fetchSolicitudes();
 });
+
 </script>
 <template>
     <Card>
         <CardContent class="p-6">
-            <div class="mb-4">
-                <Input v-model="search" placeholder="Buscar solicitud..." />
+            <div class="flex gap-4 mb-4">
+                <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1" />
+                <Select v-model="filtroEstado">
+                    <SelectTrigger class="w-[220px]">
+                        <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        <SelectItem value="todos">
+                            Todos
+                        </SelectItem>
+
+                        <SelectItem value="3">
+                            Visita asignada
+                        </SelectItem>
+                        <SelectItem value="4">
+                            Visita realizada
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <!-- tabla principal con solicitudes pendientes de visita -->
             <Table>
