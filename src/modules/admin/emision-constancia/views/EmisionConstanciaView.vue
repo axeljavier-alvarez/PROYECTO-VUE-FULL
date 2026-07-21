@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useSolicitudStore }
-   from '../stores/solicitudStore';
+import { useEmisionConstanciaStore }
+   from '../stores/emisionConstanciaStore';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -13,11 +13,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { FileText, User, History } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const solicitudStore = useSolicitudStore();
+const solicitudStore = useEmisionConstanciaStore();
 const { solicitudes, loading } = storeToRefs(solicitudStore);
 const search = ref('');
-// para ver la solicitud en un modal
 const selectedSolicitud = ref(null);
 function verSolicitud(solicitud) {
    console.log(solicitud);

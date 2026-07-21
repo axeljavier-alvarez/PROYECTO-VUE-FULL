@@ -18,7 +18,6 @@ export default {
             throw error;
         }
     },
-
     async cambiarEstado(id, estado_id) {
         try {
             const response = await apiClient.post(

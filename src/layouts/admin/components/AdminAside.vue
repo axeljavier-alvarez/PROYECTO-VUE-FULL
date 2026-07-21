@@ -53,8 +53,25 @@ const openSidebar = defineModel();
                         <span class="ms-3">Visita de campo</span>
                     </AdminNavLink>
                 </li>
+                <li>
+                    <AdminNavLink :to="{
+                        name: 'admin.emision-constancia'
+                    }">
+                            <MapPinned class="w-5 h-5" />
+
+                        <span class="ms-3">Emisión de constancias</span>
+                    </AdminNavLink>
+                </li>
+                <li>
+                    <AdminNavLink :to="{
+                        name: 'admin.autorizaciones'
+                    }">
+                            <MapPinned class="w-5 h-5" />
+
+                        <span class="ms-3">Autorizaciones</span>
+                    </AdminNavLink>
+                </li>
             </ul>
         </div>
     </aside>
-
 </template>

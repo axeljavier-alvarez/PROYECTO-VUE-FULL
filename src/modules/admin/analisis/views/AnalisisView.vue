@@ -31,12 +31,34 @@ const accionSeleccionada = ref({
    titulo: '',
    mensaje: ''
 });
+// function verSolicitud(solicitud) {
+//    console.log(solicitud);
+//    selectedSolicitud.value = solicitud;
+// }
 
-function verSolicitud(solicitud) {
-   console.log(solicitud);
+// duracion mensaje
+const mostrarMensajeAnalisis = ref(false);
+// ver soliicitudes y cambiar estado
+async function verSolicitud(solicitud) {
+   if (solicitud.estado_id === 1) {
+      await analisisStore.cambiarEstado(
+         solicitud.id,
+         2
+      );
+      await analisisStore.fetchSolicitudes();
+      solicitud = solicitudes.value.find(
+         s => s.id === solicitud.id
+      );
+      // Mostrar mensaje
+      mostrarMensajeAnalisis.value = true;
+
+      // Ocultarlo después de 3 segundos
+      setTimeout(() => {
+         mostrarMensajeAnalisis.value = false;
+      }, 3000);
+   }
    selectedSolicitud.value = solicitud;
 }
-
 // funcion para abrir modal
 function confirmarCambioEstado(estadoId, titulo, mensaje) {
    accionSeleccionada.value = {
@@ -46,7 +68,6 @@ function confirmarCambioEstado(estadoId, titulo, mensaje) {
    };
    confirmDialog.value = true;
 }
-
 // actualizar estado
 async function actualizarEstado(estadoId) {
    try {
@@ -67,13 +88,13 @@ async function actualizarEstado(estadoId) {
 const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
    let resultado = solicitudes.value;
-   if (filtroEstado.value !== 'todos'){
+   if (filtroEstado.value !== 'todos') {
       resultado = resultado.filter(
          solicitud =>
-         solicitud.estado_id === Number(filtroEstado.value)
+            solicitud.estado_id === Number(filtroEstado.value)
       );
    }
-   if(search.value){
+   if (search.value) {
       resultado = resultado.filter(solicitud => {
          const texto = `
          ${solicitud.no_solicitud}
@@ -101,7 +122,7 @@ onMounted(async () => {
             <Input v-model="search" placeholder="Buscar solicitud..." />
             <Select v-model="filtroEstado">
                <SelectTrigger class="w-[220px]">
-                  <SelectValue placeholder="Filtrar por estado"/>
+                  <SelectValue placeholder="Filtrar por estado" />
                </SelectTrigger>
                <SelectContent>
                   <SelectItem value="todos">
@@ -199,9 +220,22 @@ onMounted(async () => {
                </div>
                <!-- Contenido con scroll -->
                <div class="flex-1 overflow-y-auto p-6">
+                  <div 
+                     v-if="mostrarMensajeAnalisis"
+                     class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                     <h3 class="text-lg font-semibold text-blue-800">
+                        Solicitud en análisis
+                     </h3>
+                     <p class="mt-1 text-sm text-blue-700">
+                        La solicitud ha entrado a un proceso de análisis.
+                        El personal revisará la información y los documentos adjuntos antes de continuar
+                        con el trámite
+                     </p>
+                  </div>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <!-- Información -->
                      <div class="space-y-4">
+
                         <div
                            class="flex items-center gap-2 text-sm text-gray-500 uppercase font-semibold tracking-wider">
                            <User class="w-4 h-4 text-blue-600" />
@@ -334,6 +368,50 @@ onMounted(async () => {
                         No hay documentos adjuntos.
                      </p>
                   </div>
+                  <div
+                  v-if="selectedSolicitud?.estado_id === 4"
+                  class="mt-6">
+                     <div class="flex items-center gap-2 mb-4">
+                        <FileText class="w-5 h-5 text-blue-600" />
+                        <h3 class="font-bold">
+                           Fotos de Visita de Campo
+                        </h3>
+                     </div>
+                     <div
+                     v-if="selectedSolicitud?.fotos_visita?.length"
+                     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+                     gap-4">
+                        <div
+                        v-for="foto in selectedSolicitud.fotos_visita"
+                        :key="foto.id"
+                        class="border rounded-lg overflow-hidden shadow-sm
+                        hover:shadow-md transition">
+                           <a
+                           :href="foto.url"
+                           target="_blank">
+                           <img
+                              :src="foto.url"
+                              alt="Foto de visita"
+                              class="w-full h-52 object-cover"
+                           />
+                           </a>
+                           <div class="p-2 flex justify-end">
+                              <a
+                              :href="foto.url"
+                              download
+                              class="text-green-600 hover:text-green-800"
+                              title="Descargar">
+                              <Download class="w-5 h-5"/>
+                              </a>
+                           </div>
+                        </div>
+                     </div>
+                     <p
+                     v-else
+                     class="text-sm text-gray-500">
+                     No hay fotos de visita de campo
+                     </p>
+                  </div>
                   <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
                      <Button variant="destructive"
                         class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
@@ -345,7 +423,9 @@ onMounted(async () => {
                         <CircleX class="w-4 h-4" />
                         Rechazar Solicitud
                      </Button>
-                     <Button variant="outline"
+                     <Button 
+                        v-if="![3, 4].includes(selectedSolicitud?.estado_id)"
+                        variant="outline"
                         class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            3,
