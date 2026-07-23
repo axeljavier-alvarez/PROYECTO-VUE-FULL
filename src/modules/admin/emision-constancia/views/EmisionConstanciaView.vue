@@ -11,7 +11,9 @@ import {
    Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FileText, User, History } from 'lucide-vue-next'
+import {
+   FileText, User, History, XCircle, FileCheck
+} from 'lucide-vue-next';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 const solicitudStore = useEmisionConstanciaStore();
 const { solicitudes, loading } = storeToRefs(solicitudStore);
@@ -23,16 +25,16 @@ function verSolicitud(solicitud) {
 }
 const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
-    let resultado = solicitudes.value;
-    if (filtroEstado.value !== 'todos') {
-        resultado = resultado.filter(
-            solicitud =>
-                solicitud.estado_id === Number(filtroEstado.value)
-        );
-    }
-    if (search.value) {
-        resultado = resultado.filter(solicitud => {
-            const texto = `
+   let resultado = solicitudes.value;
+   if (filtroEstado.value !== 'todos') {
+      resultado = resultado.filter(
+         solicitud =>
+            solicitud.estado_id === Number(filtroEstado.value)
+      );
+   }
+   if (search.value) {
+      resultado = resultado.filter(solicitud => {
+         const texto = `
             ${solicitud.no_solicitud}
             ${solicitud.nombres}
             ${solicitud.apellidos}
@@ -40,13 +42,32 @@ const filteredSolicitudes = computed(() => {
             ${solicitud.estado?.nombre}
             ${solicitud.tramite?.nombre}
             `.toLowerCase();
-            return texto.includes(
-                search.value.toLowerCase()
-            );
-        });
-    }
-    return resultado;
+         return texto.includes(
+            search.value.toLowerCase()
+         );
+      });
+   }
+   return resultado;
 });
+const showRechazarModal = ref(false);
+const showEmitirModal = ref(false);
+const motivoRechazo = ref('');
+function abrirRechazo() {
+   showRechazarModal.value = true;
+}
+function abrirEmitir() {
+   showEmitirModal.value = true;
+}
+function confirmarRechazo() {
+   console.log('Rechazar:', selectedSolicitud.value.id);
+   console.log('Motivo:', motivoRechazo.value);
+   showRechazarModal.value = false;
+}
+
+function confirmarEmision() {
+   console.log('Emitir constancia: ', selectedSolicitud.value.id);
+   showEmitirModal.value = false;
+}
 onMounted(async () => {
    //  console.log('COMPONENTE MONTADO');
    await solicitudStore.fetchSolicitudes();
@@ -56,7 +77,7 @@ onMounted(async () => {
    <Card>
       <CardContent class="p-6">
          <div class="flex gap-4 mb-4">
-            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1"/>
+            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1" />
             <Select v-model="filtroEstado">
                <SelectTrigger class="w-[220px]">
                   <SelectValue placeholder="Filtrar por estado" />
@@ -274,13 +295,102 @@ onMounted(async () => {
                   </div>
                </div>
                <!-- Footer -->
-               <div class="border-t p-4 flex justify-end shrink-0">
+               <div class="border-t p-4 flex justify-end gap-3 shrink-0">
+                  <Button class="bg-red-600 hover:bg-red-700 text-white" type="button" @click="abrirRechazo">
+                     <XCircle class="w-4 h-4 mr-2" />
+                     Rechazar
+                  </Button>
                   <DialogClose as-child>
-                     <Button class="bg-green-600 hover:bg-green-700">
-                        Aceptar
+                     <Button class="bg-green-600 hover:bg-green-700 text-white" type="button" @click="abrirEmitir">
+                        <FileCheck class="w-4 h-4 mr-2" />
+                        Emitir constancia
                      </Button>
                   </DialogClose>
                </div>
+            </DialogContent>
+         </Dialog>
+         <!-- RECHAZAR SOLICITUD -->
+         <Dialog v-model:open="showRechazarModal">
+            <DialogContent class="max-w-md">
+               <DialogHeader>
+                  <DialogTitle>
+                     Rechazar Solicitud
+                  </DialogTitle>
+               </DialogHeader>
+               <div class="space-y-4">
+                  <p class="text-sm text-gray-600">
+                     Está acción no se puede deshacer
+                  </p>
+                  <p>
+                     ¿Está seguro que desa rechazar la solicitud
+                     <strong>
+                        {{ selectedSolicitud?.no_solicitud }}
+                     </strong>?
+                  </p>
+                  <div>
+                     <label class="text-sm font-medium">
+                        Motivo del rechazo *
+                     </label>
+                     <textarea v-model="motivoRechazo" class="w-full border rounded-md p-3 mt-2" rows="4"
+                        placeholder="Describa por qué se rechaza la solicitud" />
+                  </div>
+               </div>
+               <DialogFooter>
+                  <Button variant="outline" @click="showRechazarModal = false">
+                     No, cancelar
+                  </Button>
+                  <Button class="bg-red-600 hover:bg-red-700" @click="confirmarRechazo" :disabled="!motivoRechazo">
+                     Confirmar rechazo
+                  </Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
+         <Dialog v-model:open="showEmitirModal">
+            <DialogContent class="max-w-md">
+               <DialogHeader>
+                  <DialogTitle>
+                     Emitir constancia
+                  </DialogTitle>
+               </DialogHeader>
+               <div class="space-y-4">
+                  <p class="text-sm text-gray-600">
+                     Esta acción generará el documento oficial
+                  </p>
+                  <p>
+                     ¿Desea generar la constancia de la solicitud
+                     <strong>
+                        {{ selectedSolicitud?.no_solicitud }}
+                     </strong>?
+                  </p>
+
+                  <div class="bg-gray-50 rounded-lg p-3 text-sm">
+
+                     <p>
+                        ✓ Se generará la constancia
+                     </p>
+
+                     <p>
+                        ✓ El estado cambiará a emitido
+                     </p>
+
+                     <p>
+                        ✓ Se registrará en bitácora
+                     </p>
+
+                  </div>
+
+               </div>
+               <DialogFooter>
+
+                  <Button variant="outline" @click="showEmitirModal = false">
+                     Cancelar
+                  </Button>
+
+
+                  <Button class="bg-green-600 hover:bg-green-700" @click="confirmarEmision">
+                     Sí, emitir constancia
+                  </Button>
+               </DialogFooter>
             </DialogContent>
          </Dialog>
       </CardContent>
