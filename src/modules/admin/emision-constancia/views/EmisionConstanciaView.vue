@@ -11,16 +11,22 @@ import {
    Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import {
-   FileText, User, History, XCircle, FileCheck
-} from 'lucide-vue-next';
+
+import { FileText, User, History, Eye, Download, File, } from 'lucide-vue-next'
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+   Accordion,
+   AccordionContent,
+   AccordionItem,
+   AccordionTrigger
+} from '@/components/ui/accordion';
 const solicitudStore = useEmisionConstanciaStore();
 const { solicitudes, loading } = storeToRefs(solicitudStore);
 const search = ref('');
 const selectedSolicitud = ref(null);
 function verSolicitud(solicitud) {
-   console.log(solicitud);
+   console.log(solicitud.constancia);
    selectedSolicitud.value = solicitud;
 }
 const filtroEstado = ref('todos');
@@ -65,30 +71,30 @@ function confirmarRechazo() {
 }
 
 async function confirmarEmision() {
-    try {
+   try {
 
-        const response = await solicitudStore.emitirConstancia(
-            selectedSolicitud.value.id
-        );
+      const response = await solicitudStore.emitirConstancia(
+         selectedSolicitud.value.id
+      );
 
-        const url = window.URL.createObjectURL(
-            new Blob([response.data], {
-                type: 'application/pdf'
-            })
-        );
+      const url = window.URL.createObjectURL(
+         new Blob([response.data], {
+            type: 'application/pdf'
+         })
+      );
 
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'constancia.pdf';
-        link.click();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'constancia.pdf';
+      link.click();
 
-        window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
 
-        showEmitirModal.value = false;
+      showEmitirModal.value = false;
 
-    } catch (error) {
-        console.error(error);
-    }
+   } catch (error) {
+      console.error(error);
+   }
 }
 
 
@@ -198,14 +204,12 @@ onMounted(async () => {
          </Table>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
-
                <!-- Encabezado -->
                <div class="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
                   <div class="flex items-center gap-3">
                      <div class="bg-white/20 p-2 rounded-lg">
                         <FileText class="w-6 h-6" />
                      </div>
-
                      <div>
                         <h2 class="text-lg font-semibold">
                            Detalle de Solicitud
@@ -230,7 +234,6 @@ onMounted(async () => {
                            <label class="text-xs text-gray-400">
                               NOMBRE COMPLETO
                            </label>
-
                            <div class="font-medium">
                               {{ selectedSolicitud?.nombres }}
                               {{ selectedSolicitud?.apellidos }}
@@ -241,7 +244,6 @@ onMounted(async () => {
                               <label class="text-xs text-gray-400">
                                  DPI / CUI
                               </label>
-
                               <div class="font-medium">
                                  {{ selectedSolicitud?.cui }}
                               </div>
@@ -318,6 +320,119 @@ onMounted(async () => {
                         {{ selectedSolicitud?.observaciones }}
                      </div>
                   </div>
+                  <div v-if="selectedSolicitud?.estado_id === 6" class="mt-4">
+                     <Accordion type="single" collapsible>
+                        <AccordionItem value="documentacion">
+                           <AccordionTrigger>
+                              Documentación de la solicitud
+                           </AccordionTrigger>
+                           <AccordionContent>
+                              <div class="mb-4">
+                                 <div class="flex items-center gap-2 mb-4">
+                                    <FileText class="w-5 h-5 text-blue-600" />
+                                    <h3 class="font-bold">
+                                       Constancia generada
+                                    </h3>
+                                 </div>
+
+                                 <div v-if="selectedSolicitud?.constancia?.length" class="grid grid-cols-1 gap-4 mt-2">
+                                    <div v-for="constancia in selectedSolicitud.constancia" :key="constancia.id"
+                                       class="border rounded-lg p-4 bg-gray-50 hover:shadow transition">
+                                       <div class="flex items-center justify-between">
+
+                                          <div class="flex items-center gap-2">
+                                             <a :href="constancia.url" target="_blank"
+                                                class="text-blue-600 hover:text-blue-800" title="Ver constancia">
+                                                <Eye class="w-5 h-5" />
+                                             </a>
+                                             <span class="font-medium">
+                                                Constancia emitida
+                                             </span>
+                                             <a :href="constancia.url" download
+                                                class="text-green-600 hover:text-green-800"
+                                                title="Descargar constancia">
+                                                <Download class="w-5 h-5" />
+                                             </a>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div v-else class="text-sm text-gray-500 mt-2">
+                                    No existe una constancia generada.
+                                 </div>
+                              </div>
+
+                              <div class="mt-6">
+                                 <div class="flex items-center gap-2 mb-4">
+                                    <FileText class="w-5 h-5 text-blue-600" />
+                                    <h3 class="font-bold">
+                                       Documentos Adjuntos
+                                    </h3>
+                                 </div>
+
+                                 <div v-if="selectedSolicitud?.documentos?.length"
+                                    class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    <div v-for="doc in selectedSolicitud.documentos" :key="doc.id"
+                                       class="border rounded-lg p-4 bg-gray-50 hover:shadow transition">
+                                       <div class="flex items-center justify-between">
+
+                                          <div class="flex items-center gap-2 min-w-0">
+                                             <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank"
+                                                class="text-blue-600 hover:text-blue-800" title="Ver documento">
+                                                <Eye class="w-5 h-5" />
+                                             </a>
+
+                                             <span class="font-medium truncate">
+                                                {{ doc.requisito?.nombre }}
+                                             </span>
+
+                                             <a :href="`http://127.0.0.1:8000/storage/${doc.path}`"
+                                                :download="doc.requisito?.nombre"
+                                                class="text-green-600 hover:text-green-800" title="Descargar">
+                                                <Download class="w-5 h-5" />
+                                             </a>
+
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+
+                                 <p v-else class="text-sm text-gray-500">
+                                    No hay documentos adjuntos.
+                                 </p>
+                              </div>
+                              <div class="mb-4 mt-6">
+                                 <div class="flex items-center gap-2 mb-4">
+                                    <FileText class="w-5 h-5 text-blue-600" />
+                                    <h3 class="font-bold">
+                                       Resultados de visita de campo
+                                    </h3>
+                                 </div>
+
+                                 <div class="mb-4">
+                                    <label class="text-xs text-gray-500">
+                                       Descripción
+                                    </label>
+                                    <p class="mt-2 text-gray-600">
+                                      {{ selectedSolicitud.descripcion_visita || 'No se ingresó descripción de la visita.' }}
+                                    </p>
+                                 </div>
+                                 <div v-if="selectedSolicitud.fotos_visita?.length"
+                                    class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    <img v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" :src="foto.url"
+                                       class="rounded-lg border object-cover h-40 w-full">
+
+                                 </div>
+                                 <div v-else class="text-sm text-gray-500">
+                                    No existen fotografías.
+                                 </div>
+
+                              </div>
+
+                           </AccordionContent>
+                        </AccordionItem>
+                     </Accordion>
+                  </div>
                </div>
                <!-- Footer -->
                <div class="border-t p-4 flex justify-end gap-3 shrink-0">
@@ -325,12 +440,9 @@ onMounted(async () => {
                      <XCircle class="w-4 h-4 mr-2" />
                      Rechazar
                   </Button>
-                  
-                  <Button
-                     class="bg-green-600 hover:bg-green-700 text-white"
-                     type="button"
-                     @click="abrirEmitir"
-                  >
+
+                  <Button class="bg-green-600 hover:bg-green-700 text-white" type="button"
+                     v-if="selectedSolicitud?.estado_id === 5" @click="abrirEmitir">
                      <FileCheck class="w-4 h-4 mr-2" />
                      Emitir constancia
                   </Button>
@@ -405,7 +517,6 @@ onMounted(async () => {
                      <p>
                         ✓ Se registrará en bitácora
                      </p>
-
                   </div>
 
                </div>
