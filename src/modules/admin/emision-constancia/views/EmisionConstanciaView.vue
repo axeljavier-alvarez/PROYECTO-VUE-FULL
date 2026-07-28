@@ -12,9 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 
-import { FileText, User, History, Eye, Download, File, } from 'lucide-vue-next'
+import { FileText, User, History, Eye, Download, File, CircleX, Search, TriangleAlert, FileCheck, XCircle } from 'lucide-vue-next'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import {
    Accordion,
    AccordionContent,

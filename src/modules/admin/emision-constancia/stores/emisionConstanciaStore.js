@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import solicitudService from '../services/emisionConstanciaService';
 
 export const useEmisionConstanciaStore = defineStore(
-    'solicitudes',
+    'emisionConstancia',
     () => {
         const loading = ref(false);
         const solicitudes = ref([]);

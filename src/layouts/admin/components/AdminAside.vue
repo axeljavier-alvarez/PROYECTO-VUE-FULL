@@ -3,7 +3,12 @@ import {
     LayoutDashboard,
     FileText,
     FileSearch,
-    MapPinned
+    MapPinned,
+    FileCheck,
+    FileBadge,
+    FileSignature,
+    ScrollText,
+    ShieldCheck
 } from 'lucide-vue-next';
 import AdminNav from './AdminNav.vue';
 import AdminNavLink from './AdminNavLink.vue';
@@ -57,8 +62,7 @@ const openSidebar = defineModel();
                     <AdminNavLink :to="{
                         name: 'admin.emision-constancia'
                     }">
-                            <MapPinned class="w-5 h-5" />
-
+                           <FileBadge class="w-5 h-5" />
                         <span class="ms-3">Emisión de constancias</span>
                     </AdminNavLink>
                 </li>
@@ -66,7 +70,7 @@ const openSidebar = defineModel();
                     <AdminNavLink :to="{
                         name: 'admin.autorizaciones'
                     }">
-                            <MapPinned class="w-5 h-5" />
+                            <ShieldCheck class="w-5 h-5" />
 
                         <span class="ms-3">Autorizaciones</span>
                     </AdminNavLink>
