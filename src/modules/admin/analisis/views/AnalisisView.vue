@@ -220,9 +220,7 @@ onMounted(async () => {
                </div>
                <!-- Contenido con scroll -->
                <div class="flex-1 overflow-y-auto p-6">
-                  <div 
-                     v-if="mostrarMensajeAnalisis"
-                     class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                  <div v-if="mostrarMensajeAnalisis" class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
                      <h3 class="text-lg font-semibold text-blue-800">
                         Solicitud en análisis
                      </h3>
@@ -368,50 +366,35 @@ onMounted(async () => {
                         No hay documentos adjuntos.
                      </p>
                   </div>
-                  <div
-                  v-if="selectedSolicitud?.estado_id === 4"
-                  class="mt-6">
+                  <div v-if="selectedSolicitud?.estado_id === 4" class="mt-6">
                      <div class="flex items-center gap-2 mb-4">
                         <FileText class="w-5 h-5 text-blue-600" />
                         <h3 class="font-bold">
                            Fotos de Visita de Campo
                         </h3>
                      </div>
-                     <div
-                     v-if="selectedSolicitud?.fotos_visita?.length"
-                     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+                     <div v-if="selectedSolicitud?.fotos_visita?.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
                      gap-4">
-                        <div
-                        v-for="foto in selectedSolicitud.fotos_visita"
-                        :key="foto.id"
-                        class="border rounded-lg overflow-hidden shadow-sm
+                        <div v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" class="border rounded-lg overflow-hidden shadow-sm
                         hover:shadow-md transition">
-                           <a
-                           :href="foto.url"
-                           target="_blank">
-                           <img
-                              :src="foto.url"
-                              alt="Foto de visita"
-                              class="w-full h-52 object-cover"
-                           />
+                           <a :href="foto.url" target="_blank">
+                              <img :src="foto.url" alt="Foto de visita" class="w-full h-52 object-cover" />
                            </a>
                            <div class="p-2 flex justify-end">
-                              <a
-                              :href="foto.url"
-                              download
-                              class="text-green-600 hover:text-green-800"
-                              title="Descargar">
-                              <Download class="w-5 h-5"/>
+                              <a :href="foto.url" download class="text-green-600 hover:text-green-800"
+                                 title="Descargar">
+                                 <Download class="w-5 h-5" />
                               </a>
                            </div>
                         </div>
                      </div>
-                     <p
-                     v-else
-                     class="text-sm text-gray-500">
-                     No hay fotos de visita de campo
+                     <p v-else class="text-sm text-gray-500">
+                        No hay fotos de visita de campo
                      </p>
                   </div>
+               </div>
+               <!-- Footer -->
+               <div class="border-t p-4 flex justify-end shrink-0">
                   <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
                      <Button variant="destructive"
                         class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
@@ -423,9 +406,7 @@ onMounted(async () => {
                         <CircleX class="w-4 h-4" />
                         Rechazar Solicitud
                      </Button>
-                     <Button 
-                        v-if="![3, 4].includes(selectedSolicitud?.estado_id)"
-                        variant="outline"
+                     <Button v-if="![3, 4].includes(selectedSolicitud?.estado_id)" variant="outline"
                         class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            3,
@@ -456,14 +437,6 @@ onMounted(async () => {
                         Enviar a Autorizar
                      </Button>
                   </div>
-               </div>
-               <!-- Footer -->
-               <div class="border-t p-4 flex justify-end shrink-0">
-                  <DialogClose as-child>
-                     <Button class="bg-green-600 hover:bg-green-700">
-                        Aceptar
-                     </Button>
-                  </DialogClose>
                </div>
             </DialogContent>
          </Dialog>

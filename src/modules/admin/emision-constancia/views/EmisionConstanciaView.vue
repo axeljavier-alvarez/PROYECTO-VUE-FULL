@@ -70,36 +70,31 @@ function confirmarRechazo() {
    console.log('Motivo:', motivoRechazo.value);
    showRechazarModal.value = false;
 }
-
 async function confirmarEmision() {
    try {
-
       const response = await solicitudStore.emitirConstancia(
          selectedSolicitud.value.id
       );
-
       const url = window.URL.createObjectURL(
          new Blob([response.data], {
             type: 'application/pdf'
          })
       );
-
       const link = document.createElement('a');
       link.href = url;
       link.download = 'constancia.pdf';
       link.click();
-
       window.URL.revokeObjectURL(url);
-
+      // cerrar el modal de confirmación
       showEmitirModal.value = false;
-
+      // cerrar el modal de detalle
+      selectedSolicitud.value = null;
+      // volver a consultar las solicitudes
+      await solicitudStore.fetchSolicitudes();
    } catch (error) {
       console.error(error);
    }
 }
-
-
-
 onMounted(async () => {
    //  console.log('COMPONENTE MONTADO');
    await solicitudStore.fetchSolicitudes();
@@ -409,7 +404,6 @@ onMounted(async () => {
                                        Resultados de visita de campo
                                     </h3>
                                  </div>
-
                                  <div class="mb-4">
                                     <label class="text-xs text-gray-500">
                                        Descripción
@@ -422,14 +416,11 @@ onMounted(async () => {
                                     class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     <img v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" :src="foto.url"
                                        class="rounded-lg border object-cover h-40 w-full">
-
                                  </div>
                                  <div v-else class="text-sm text-gray-500">
                                     No existen fotografías.
                                  </div>
-
                               </div>
-
                            </AccordionContent>
                         </AccordionItem>
                      </Accordion>
@@ -437,17 +428,16 @@ onMounted(async () => {
                </div>
                <!-- Footer -->
                <div class="border-t p-4 flex justify-end gap-3 shrink-0">
-                  <Button class="bg-red-600 hover:bg-red-700 text-white" type="button" @click="abrirRechazo">
+                  <Button class="bg-red-600 hover:bg-red-700 text-white" type="button" 
+                  v-if="selectedSolicitud?.estado_id === 5" @click="abrirRechazo">
                      <XCircle class="w-4 h-4 mr-2" />
                      Rechazar
                   </Button>
-
                   <Button class="bg-green-600 hover:bg-green-700 text-white" type="button"
                      v-if="selectedSolicitud?.estado_id === 5" @click="abrirEmitir">
                      <FileCheck class="w-4 h-4 mr-2" />
                      Emitir constancia
                   </Button>
-
                </div>
             </DialogContent>
          </Dialog>
