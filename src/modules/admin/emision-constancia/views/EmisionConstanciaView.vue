@@ -64,10 +64,35 @@ function confirmarRechazo() {
    showRechazarModal.value = false;
 }
 
-function confirmarEmision() {
-   console.log('Emitir constancia: ', selectedSolicitud.value.id);
-   showEmitirModal.value = false;
+async function confirmarEmision() {
+    try {
+
+        const response = await solicitudStore.emitirConstancia(
+            selectedSolicitud.value.id
+        );
+
+        const url = window.URL.createObjectURL(
+            new Blob([response.data], {
+                type: 'application/pdf'
+            })
+        );
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'constancia.pdf';
+        link.click();
+
+        window.URL.revokeObjectURL(url);
+
+        showEmitirModal.value = false;
+
+    } catch (error) {
+        console.error(error);
+    }
 }
+
+
+
 onMounted(async () => {
    //  console.log('COMPONENTE MONTADO');
    await solicitudStore.fetchSolicitudes();
@@ -300,12 +325,16 @@ onMounted(async () => {
                      <XCircle class="w-4 h-4 mr-2" />
                      Rechazar
                   </Button>
-                  <DialogClose as-child>
-                     <Button class="bg-green-600 hover:bg-green-700 text-white" type="button" @click="abrirEmitir">
-                        <FileCheck class="w-4 h-4 mr-2" />
-                        Emitir constancia
-                     </Button>
-                  </DialogClose>
+                  
+                  <Button
+                     class="bg-green-600 hover:bg-green-700 text-white"
+                     type="button"
+                     @click="abrirEmitir"
+                  >
+                     <FileCheck class="w-4 h-4 mr-2" />
+                     Emitir constancia
+                  </Button>
+
                </div>
             </DialogContent>
          </Dialog>

@@ -18,5 +18,12 @@ export default {
             );
             throw error;
         }
+    },
+
+    async emitirConstancia(id) {
+        return await apiClient.get(`/solicitudes/${id}/pdf`, {
+            responseType: 'blob'
+        });
     }
+    
 }

@@ -22,10 +22,15 @@ export const useEmisionConstanciaStore = defineStore(
             }
         }
 
+        async function emitirConstancia(id) {
+            return await solicitudService.emitirConstancia(id);
+        }
+
         return {
             loading,
             solicitudes,
-            fetchSolicitudes
+            fetchSolicitudes,
+            emitirConstancia
         }
     }
 );
