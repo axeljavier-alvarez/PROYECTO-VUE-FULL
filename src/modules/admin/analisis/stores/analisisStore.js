@@ -42,12 +42,21 @@ export const useAnalisisStore = defineStore(
             await fetchSolicitudes(); 
             return response;
         }
-        
+
+        async function rechazar(id, data){
+            const response = await analisisService.rechazarSolicitud(
+            id, data
+            );
+            await fetchSolicitudes();
+            return response;
+        }
+
         return {
             loading,
             solicitudes,
             fetchSolicitudes,
-            cambiarEstado
+            cambiarEstado,
+            rechazar
         };
     }
 );

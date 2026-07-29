@@ -65,10 +65,24 @@ function abrirRechazo() {
 function abrirEmitir() {
    showEmitirModal.value = true;
 }
-function confirmarRechazo() {
-   console.log('Rechazar:', selectedSolicitud.value.id);
-   console.log('Motivo:', motivoRechazo.value);
-   showRechazarModal.value = false;
+async function confirmarRechazo() {
+   try {
+      await solicitudStore.rechazar(
+         selectedSolicitud.value.id,
+         {
+           estado_id: 9,
+           descripcion: motivoRechazo.value 
+         }
+      );
+      // cerrar el modal de rechazo
+      showRechazarModal.value = false;
+      // cerrar modal principal
+      selectedSolicitud.value = null;
+      // limpiar el textarea
+      motivoRechazo.value = '';
+   } catch(error) {
+      console.log(error);
+   }
 }
 async function confirmarEmision() {
    try {

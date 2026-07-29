@@ -24,6 +24,21 @@ export default {
         return await apiClient.get(`/solicitudes/${id}/pdf`, {
             responseType: 'blob'
         });
+    },
+    async rechazarSolicitud(id, data) {
+        try {
+             const response = await apiClient.put(
+                `/solicitudes/${id}/rechazar`,
+                data
+             );
+            return response.data;
+        } catch (error) {
+            console.log(
+                'Error al rechazar la solicitud: ',
+                error.response?.data || error.message
+            );
+            throw error;
+        }
     }
     
 }

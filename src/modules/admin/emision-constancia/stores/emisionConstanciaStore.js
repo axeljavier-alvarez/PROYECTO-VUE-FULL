@@ -26,11 +26,20 @@ export const useEmisionConstanciaStore = defineStore(
             return await solicitudService.emitirConstancia(id);
         }
 
+        async function rechazar(id, data){
+            const response = await solicitudService.rechazarSolicitud(
+            id, data
+            );
+            await fetchSolicitudes();
+            return response;
+        }
+
         return {
             loading,
             solicitudes,
             fetchSolicitudes,
-            emitirConstancia
+            emitirConstancia,
+            rechazar
         }
     }
 );

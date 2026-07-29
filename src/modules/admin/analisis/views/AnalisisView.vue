@@ -38,6 +38,7 @@ const accionSeleccionada = ref({
 
 // duracion mensaje
 const mostrarMensajeAnalisis = ref(false);
+
 // ver soliicitudes y cambiar estado
 async function verSolicitud(solicitud) {
    if (solicitud.estado_id === 1) {
@@ -68,23 +69,47 @@ function confirmarCambioEstado(estadoId, titulo, mensaje) {
    };
    confirmDialog.value = true;
 }
+// rechazar solicitud
+const motivoRechazo = ref('');
 // actualizar estado
-async function actualizarEstado(estadoId) {
+async function actualizarEstado() {
+
    try {
-      await analisisStore.cambiarEstado(
-         selectedSolicitud.value.id,
-         accionSeleccionada.value.estadoId
-      );
+
+      if (accionSeleccionada.value.estadoId === 9) {
+
+         await analisisStore.rechazar(
+            selectedSolicitud.value.id,
+            {
+               estado_id: 9,
+               descripcion: motivoRechazo.value
+            }
+         );
+
+      } else {
+
+         await analisisStore.cambiarEstado(
+            selectedSolicitud.value.id,
+            accionSeleccionada.value.estadoId
+         );
+
+      }
+
 
       confirmDialog.value = false;
-      await analisisStore.fetchSolicitudes();
 
       selectedSolicitud.value = null;
 
-   } catch (error) {
+      motivoRechazo.value = '';
+
+   } catch(error){
+
       console.error(error);
+
    }
+
 }
+
 const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
    let resultado = solicitudes.value;
@@ -398,6 +423,7 @@ onMounted(async () => {
                <div class="border-t p-4 shrink-0">
                   <div class="flex flex-wrap justify-end gap-3">
                      <Button variant="destructive"
+                        v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            9,
@@ -420,6 +446,7 @@ onMounted(async () => {
                      </Button>
 
                      <Button variant="outline"
+                        v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            8,
@@ -431,6 +458,7 @@ onMounted(async () => {
                      </Button>
 
                      <Button
+                        v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            5,
@@ -454,6 +482,17 @@ onMounted(async () => {
                <p class="text-sm text-gray-600">
                   {{ accionSeleccionada.mensaje }}
                </p>
+               <div v-if="accionSeleccionada.estadoId === 9" class="mt-4">
+                  <label class="text-sm font-medium">
+                     Motivo del rechazo
+                  </label>
+                  <textarea
+                     v-model="motivoRechazo"
+                     rows="4"
+                     class="w-full border rounded-md p-3 mt-2"
+                     placeholder="Describa por qué se rechaza la solicitud"
+                  />
+               </div>
                <DialogFooter class="mt-6">
                   <Button variant="outline" @click="confirmDialog = false">
                      Cancelar
