@@ -11,13 +11,13 @@ import {
    Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FileText, User, History } from 'lucide-vue-next'
+import { FileText, User, History, Eye, Download, File, CircleX, Search, TriangleAlert, FileCheck, XCircle, CheckCircle } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 const solicitudStore = useSolicitudStore();
 const { solicitudes, loading } = storeToRefs(solicitudStore);
 const search = ref('');
 const selectedSolicitud = ref(null);
-function verSolicitudes(solicitud){
+function verSolicitudes(solicitud) {
    console.log(solicitud);
    selectedSolicitud.value = solicitud;
 }
@@ -45,33 +45,33 @@ const filtroEstado = ref('todos');
  * - El texto de búsqueda.
  */
 const filteredSolicitudes = computed(() => {
-    // Obtiene la lista completa de solicitudes almacenada en el estado.
-    let resultado = solicitudes.value;
-    /**
-     * Filtrado por estado.
-     *
-     * Si el usuario selecciona un estado diferente a "todos",
-     * se filtran únicamente las solicitudes cuyo estado_id
-     * coincida con el estado seleccionado.
-     */
-    if (filtroEstado.value !== 'todos') {
+   // Obtiene la lista completa de solicitudes almacenada en el estado.
+   let resultado = solicitudes.value;
+   /**
+    * Filtrado por estado.
+    *
+    * Si el usuario selecciona un estado diferente a "todos",
+    * se filtran únicamente las solicitudes cuyo estado_id
+    * coincida con el estado seleccionado.
+    */
+   if (filtroEstado.value !== 'todos') {
 
-        resultado = resultado.filter(
-            solicitud =>
-                solicitud.estado_id === Number(filtroEstado.value)
-        );
-    }
-    /**
-     * Filtrado por texto de búsqueda.
-     *
-     * Busca coincidencias en múltiples campos de la solicitud.
-     * Se construye un texto con la información disponible y se
-     * convierte a minúsculas para realizar una búsqueda
-     * independiente de mayúsculas y minúsculas.
-     */
-    if (search.value) {
-        resultado = resultado.filter(solicitud => {
-            const texto = `
+      resultado = resultado.filter(
+         solicitud =>
+            solicitud.estado_id === Number(filtroEstado.value)
+      );
+   }
+   /**
+    * Filtrado por texto de búsqueda.
+    *
+    * Busca coincidencias en múltiples campos de la solicitud.
+    * Se construye un texto con la información disponible y se
+    * convierte a minúsculas para realizar una búsqueda
+    * independiente de mayúsculas y minúsculas.
+    */
+   if (search.value) {
+      resultado = resultado.filter(solicitud => {
+         const texto = `
                 ${solicitud.no_solicitud}
                 ${solicitud.nombres}
                 ${solicitud.apellidos}
@@ -79,18 +79,61 @@ const filteredSolicitudes = computed(() => {
                 ${solicitud.estado?.nombre}
                 ${solicitud.tramite?.nombre}
             `.toLowerCase();
-            // Verifica si el texto buscado existe dentro
-            // de la información de la solicitud.
-            return texto.includes(
-                search.value.toLowerCase()
-            );
-        });
-    }
-    // Retorna la lista final después de aplicar los filtros.
-    return resultado;
+         // Verifica si el texto buscado existe dentro
+         // de la información de la solicitud.
+         return texto.includes(
+            search.value.toLowerCase()
+         );
+      });
+   }
+   // Retorna la lista final después de aplicar los filtros.
+   return resultado;
 });
+// modal de rechazar
+const showRechazarModal = ref(false);
+const motivoRechazo = ref('');
+function abrirRechazo() {
+   showRechazarModal.value = true;
+}
+async function confirmarRechazo() {
+   try {
+      await solicitudStore.noAutorizar(
+         selectedSolicitud.value.id,
+         {
+            estado_id: 9,
+            descripcion: motivoRechazo.value
+         }
+      );
+      // cerrar el modal de rechazo
+      showRechazarModal.value = false;
+      // cerrar modal principal
+      selectedSolicitud.value = null;
+      // limpiar el textarea
+      motivoRechazo.value = '';
+   } catch(error){
+      console.log(error);
+   }
+}
+// actualizar estado
+const showAutorizarModal = ref(false);
+function abrirAutorizar() {
+   showAutorizarModal.value = true;
+}
+async function confirmarAutorizar() {
+   try {
+      await solicitudStore.cambiarEstado(
+         selectedSolicitud.value.id,
+         7
+      );
+      showAutorizarModal.value = false;
+      selectedSolicitud.value = null;
+   } catch (error) {
+      console.log(error);
+   }
+}
+
 onMounted(async () => {
-    console.log('COMPONENTE MONTADO');
+   console.log('COMPONENTE MONTADO');
    await solicitudStore.fetchSolicitudes();
 });
 </script>
@@ -99,7 +142,7 @@ onMounted(async () => {
    <Card>
       <CardContent class="p-6">
          <div class="flex gap-4 mb-4">
-            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1"/>
+            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1" />
             <Select v-model="filtroEstado">
                <SelectTrigger class="w-[220px]">
                   <SelectValue placeholder="Filtrar por estado" />
@@ -317,13 +360,82 @@ onMounted(async () => {
                   </div>
                </div>
                <!-- Footer -->
-               <div class="border-t p-4 flex justify-end shrink-0">
-                  <DialogClose as-child>
-                     <Button class="bg-green-600 hover:bg-green-700">
-                        Aceptar
-                     </Button>
-                  </DialogClose>
+               <div class="border-t p-4 flex justify-end gap-3 shrink-0">
+                  <Button class="bg-red-600 hover:bg-red-700 text-white" type="button"
+                     v-if="selectedSolicitud?.estado_id === 6" @click="abrirRechazo">
+                     <XCircle class="w-4 h-4 mr-2" />
+                     No autorizar
+                  </Button>
+                  <Button v-if="selectedSolicitud?.estado_id === 6" class="bg-green-600 hover:bg-green-700"
+                     type="button" @click="abrirAutorizar">
+                     <CheckCircle class="w-4 h-4 mr-2" />
+                     Autorizar Solicitud
+                  </Button>
                </div>
+            </DialogContent>
+         </Dialog>
+         <Dialog v-model:open="showRechazarModal">
+            <DialogContent class="max-w-md">
+               <DialogHeader>
+                  <DialogTitle>
+                     No autorizar
+                  </DialogTitle>
+               </DialogHeader>
+               <div class="space-y-4">
+                  <p class="text-sm text-gray-600">
+                     Está acción no se puede deshacer
+                  </p>
+                  <p>
+                     ¿Está seguro de no autorizar la solicitud
+                     <strong>
+                        {{ selectedSolicitud?.no_solicitud }}
+                     </strong>?
+                  </p>
+                  <div>
+                     <label class="text-sm font-medium">
+                        Motivo
+                     </label>
+                     <textarea v-model="motivoRechazo" class="w-full border rounded-md p-3 mt-2" rows="4"
+                        placeholder="Describa por qué se rechaza la solicitud" />
+                  </div>
+               </div>
+               <DialogFooter>
+                  <Button variant="outline" @click="showRechazarModal = false">
+                     Cancelar
+                  </Button>
+                  <Button class="bg-red-600 hover:bg-red-700" @click="confirmarRechazo" :disabled="!motivoRechazo">
+                     No autorizar
+                  </Button>
+               </DialogFooter>
+            </DialogContent>
+         </Dialog>
+         <Dialog v-model:open="showAutorizarModal">
+            <DialogContent class="max-w-md">
+               <DialogHeader>
+                  <DialogTitle>
+                     Autorizar Solicitud
+                  </DialogTitle>
+               </DialogHeader>
+               <div class="space-y-4">
+                  <p class="text-sm text-gray-600">
+                     Esta acción cambiará el estado de la solicitud.
+                  </p>
+                  <p>
+                     ¿Está seguro de autorizar la solicitud
+                     <strong>
+                        {{ selectedSolicitud?.no_solicitud }}
+                     </strong>?
+                  </p>
+               </div>
+               <DialogFooter>
+                  <Button variant="outline" @click="showAutorizarModal = false">
+                     Cancelar
+                  </Button>
+                  <Button class="bg-green-600 hover:bg-green-700" @click="confirmarAutorizar">
+                     <CheckCircle class="w-4 h-4 mr-2" />
+                     Autorizar
+                  </Button>
+               </DialogFooter>
             </DialogContent>
          </Dialog>
       </CardContent>

@@ -394,10 +394,11 @@ onMounted(async () => {
                   </div>
                </div>
                <!-- Footer -->
-               <div class="border-t p-4 flex justify-end shrink-0">
-                  <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+               <!-- Footer -->
+               <div class="border-t p-4 shrink-0">
+                  <div class="flex flex-wrap justify-end gap-3">
                      <Button variant="destructive"
-                        class="w-full flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            9,
                            'Rechazar Solicitud',
@@ -406,8 +407,9 @@ onMounted(async () => {
                         <CircleX class="w-4 h-4" />
                         Rechazar Solicitud
                      </Button>
+
                      <Button v-if="![3, 4].includes(selectedSolicitud?.estado_id)" variant="outline"
-                        class="w-full border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        class="w-full sm:w-auto border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            3,
                            'Inspección de Campo',
@@ -416,8 +418,9 @@ onMounted(async () => {
                         <Search class="w-4 h-4" />
                         Inspección de Campo
                      </Button>
+
                      <Button variant="outline"
-                        class="w-full border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        class="w-full sm:w-auto border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            8,
                            'Enviar a Previo',
@@ -426,8 +429,9 @@ onMounted(async () => {
                         <TriangleAlert class="w-4 h-4" />
                         Enviar a Previo
                      </Button>
+
                      <Button
-                        class="w-full bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
+                        class="w-full sm:w-auto bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            5,
                            'Enviar a Autorizar',
