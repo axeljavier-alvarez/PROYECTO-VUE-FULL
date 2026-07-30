@@ -6,9 +6,22 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ref } from 'vue';
 import { useConsultaStore } from '../stores/consultaStore';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 const consultaStore = useConsultaStore();
 const cui = ref('');
 const noSolicitud = ref('');
+const mostrarModal = ref(false);
+async function consultar() {
+    const correcto = await consultaStore.consultar({
+        cui: cui.value,
+        no_solicitud: noSolicitud.value
+    });
+    // mostrar en consola
+    if (correcto) {
+        console.log(consultaStore.solicitud);
+        mostrarModal.value = true;
+    }
+}
 </script>
 <template>
     <div>
@@ -29,16 +42,16 @@ const noSolicitud = ref('');
                         <Label>
                             Número de dpi/cui
                         </Label>
-                        <Input placeholder="0000 00000 0000"/>
+                        <Input v-model="cui" placeholder="0000 00000 0000" />
                     </div>
                     <div class="grid gap-2">
                         <Label>
                             Número de solicitud
                         </Label>
-                        <Input placeholder="Ej: 1-2025"/>
+                        <Input v-model="noSolicitud" placeholder="Ej: 1-2025" />
                     </div>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <Button type="button">
+                        <Button type="button" @click="consultar">
                             Consultar ahora
                         </Button>
                         <Button type="button">
@@ -48,5 +61,92 @@ const noSolicitud = ref('');
                 </form>
             </CardContent>
         </Card>
+        <Dialog v-model:open="mostrarModal">
+            <DialogContent class="max-w-3xl">
+                <DialogHeader>
+                    <DialogTitle class="text-2xl text-[#032C8F]">
+                        Detalles de Consulta
+                    </DialogTitle>
+                    <DialogDescription>
+                        Información actualizada en tiempo real
+                    </DialogDescription>
+                </DialogHeader>
+                <div v-if="consultaStore.solicitud" class="space-y-6">
+                    <!-- SOLICITANTE -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-2">
+                            Solicitante
+                        </h3>
+                        <p>
+                            {{ consultaStore.solicitud.nombres }}
+                            {{ consultaStore.solicitud.apellidos }}
+                        </p>
+                    </div>
+                    <!-- ESTADO ACTUAL -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-2">
+                            Estado Actual
+                        </h3>
+                        <span class="px-3 py-1 rounded bg-blue-100
+                        text-blue-800">
+                            {{ consultaStore.solicitud.estado.nombre }}
+                        </span>
+                    </div>
+                    <!-- PROGRESO -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-4">
+                            Progreso de la solicitud
+                        </h3>
+                        <div class="flex justify-between items-center">
+
+                            <div class="text-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    1
+                                </div>
+                                <span class="text-sm">
+                                    Pendiente
+                                </span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    2
+                                </div>
+                                <span class="text-sm">
+                                    Análisis
+                                </span>
+                            </div>
+                            <div class="text-center">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
+                                    {{ consultaStore.solicitud.estado_id }}
+                                </div>
+
+                                <span class="text-sm">
+                                    Actual
+                                </span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-10 h-10 rounded-full bg-gray-200
+                                flex items-center justify-center">
+                                5
+                                </div>
+                                <span class="text-sm">
+                                    Autorizado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-50 border border-green-200
+                    rounded-lg p-4">
+                    <p>
+                      La solicitud se encuentra actualmente en:
+                      <strong>
+                        {{ consultaStore.solicitud.estado.nombre }}
+                      </strong>  
+                    </p>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     </div>
 </template>
