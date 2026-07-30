@@ -109,6 +109,24 @@ async function confirmarEmision() {
       console.error(error);
    }
 }
+// descargar documento
+async function descargarDocumento(id, path) {
+   try {
+      const response = await solicitudStore.descargarDocumento(id);
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement('a');
+      link.href = url;
+      // Obtener el nombre real del archivo
+      link.download = path.split('/').pop();
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+   } catch (error) {
+      console.log(error);
+   }
+}
 onMounted(async () => {
    //  console.log('COMPONENTE MONTADO');
    await solicitudStore.fetchSolicitudes();
@@ -358,11 +376,11 @@ onMounted(async () => {
                                              <span class="font-medium">
                                                 Constancia emitida
                                              </span>
-                                             <a :href="constancia.url" download
-                                                class="text-green-600 hover:text-green-800"
-                                                title="Descargar constancia">
-                                                <Download class="w-5 h-5" />
-                                             </a>
+                                             <Button variant="ghost" size="icon"
+                                             
+                                             @click="descargarDocumento(constancia.id, constancia.path)">
+                                                      <Download class="w-5 h-5" />
+                                             </Button>                                             
                                           </div>
                                        </div>
                                     </div>
@@ -371,7 +389,6 @@ onMounted(async () => {
                                     No existe una constancia generada.
                                  </div>
                               </div>
-
                               <div class="mt-6">
                                  <div class="flex items-center gap-2 mb-4">
                                     <FileText class="w-5 h-5 text-blue-600" />
@@ -379,34 +396,27 @@ onMounted(async () => {
                                        Documentos Adjuntos
                                     </h3>
                                  </div>
-
                                  <div v-if="selectedSolicitud?.documentos?.length"
                                     class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                     <div v-for="doc in selectedSolicitud.documentos" :key="doc.id"
                                        class="border rounded-lg p-4 bg-gray-50 hover:shadow transition">
                                        <div class="flex items-center justify-between">
-
                                           <div class="flex items-center gap-2 min-w-0">
                                              <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank"
                                                 class="text-blue-600 hover:text-blue-800" title="Ver documento">
                                                 <Eye class="w-5 h-5" />
                                              </a>
-
                                              <span class="font-medium truncate">
                                                 {{ doc.requisito?.nombre }}
                                              </span>
-
-                                             <a :href="`http://127.0.0.1:8000/storage/${doc.path}`"
-                                                :download="doc.requisito?.nombre"
-                                                class="text-green-600 hover:text-green-800" title="Descargar">
+                                              <Button variant="ghost" size="icon"
+                                                @click="descargarDocumento(doc.id, doc.path)">
                                                 <Download class="w-5 h-5" />
-                                             </a>
-
+                                             </Button>
                                           </div>
                                        </div>
                                     </div>
                                  </div>
-
                                  <p v-else class="text-sm text-gray-500">
                                     No hay documentos adjuntos.
                                  </p>
@@ -418,22 +428,29 @@ onMounted(async () => {
                                        Resultados de visita de campo
                                     </h3>
                                  </div>
-                                 <div class="mb-4">
-                                    <label class="text-xs text-gray-500">
-                                       Descripción
-                                    </label>
-                                    <p class="mt-2 text-gray-600">
-                                      {{ selectedSolicitud.descripcion_visita || 'No se ingresó descripción de la visita.' }}
-                                    </p>
-                                 </div>
-                                 <div v-if="selectedSolicitud.fotos_visita?.length"
-                                    class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                    <img v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" :src="foto.url"
-                                       class="rounded-lg border object-cover h-40 w-full">
-                                 </div>
-                                 <div v-else class="text-sm text-gray-500">
-                                    No existen fotografías.
-                                 </div>
+                                       <div class="mt-4 border rounded-lg p-3 bg-gray-50">
+                                                <label class="text-xs text-gray-400">
+                                                      Descripción
+                                                </label>
+                                                <div class="font-medium">
+                                                      {{ selectedSolicitud?.descripcion_visita || 'No se ingresó descripción de la visita.' }}
+                                                </div>
+                                       </div>
+                                       <div v-if="selectedSolicitud?.fotos_visita?.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                            <div v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" class="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
+                                                <a :href="foto.url" target="_blank">
+                                                    <img :src="foto.url" alt="Foto de visita"
+                                                        class="w-full h-52 object-cover" />
+                                                </a>
+                                                <Button variant="ghost" size="icon"
+                                                    @click="descargarDocumento(foto.id, foto.path)">
+                                                    <Download class="w-5 h-5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <p v-else class="text-sm text-gray-500">
+                                            No hay fotos de visita de campo
+                                        </p>
                               </div>
                            </AccordionContent>
                         </AccordionItem>

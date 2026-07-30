@@ -187,6 +187,19 @@ async function guardarVisita() {
         }
     }
 }
+async function descargarFoto(id, path) {
+    try {
+        const response = await visitaCampoStore.descargarFoto(id);
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = path.split('/').pop();
+        link.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.log(error);
+    }
+}
 /* consulta las solicitudes disponibles para vista de campo y  
 las almacena en store para mostrarlas en la tabla */
 onMounted(async () => {
@@ -400,23 +413,31 @@ onMounted(async () => {
                                         Resultados de visita de campo
                                     </AccordionTrigger>
                                     <AccordionContent>
-                                        <div class="mb-4">
-                                            <label class="text-xs text-gray-500">
+                                        <div class="mt-4 border rounded-lg p-3 bg-gray-50">
+                                            <label class="text-xs text-gray-400">
                                                 Descripción
                                             </label>
-                                            <p class="mt-2">
-                                                {{ selectedSolicitud.descripcion_visita }}
-                                            </p>
+                                            <div class="font-medium">
+                                                {{ selectedSolicitud?.descripcion_visita || 'No se ingresó descripción de la visita.' }}
+                                            </div>
                                         </div>
-                                        <div v-if="selectedSolicitud.fotos_visita?.length"
-                                            class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                            <img v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id"
-                                                :src="foto.url" class="rounded-lg border object-cover h-40 w-full">
-
+                                        <div v-if="selectedSolicitud?.fotos_visita?.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3
+                     gap-4">
+                                            <div v-for="foto in selectedSolicitud.fotos_visita" :key="foto.id" class="border rounded-lg overflow-hidden shadow-sm
+                        hover:shadow-md transition">
+                                                <a :href="foto.url" target="_blank">
+                                                    <img :src="foto.url" alt="Foto de visita"
+                                                        class="w-full h-52 object-cover" />
+                                                </a>
+                                                <Button variant="ghost" size="icon"
+                                                    @click="descargarFoto(foto.id, foto.path)">
+                                                    <Download class="w-5 h-5" />
+                                                </Button>
+                                            </div>
                                         </div>
-                                        <div v-else class="text-sm text-gray-500">
-                                            No existen fotografías.
-                                        </div>
+                                        <p v-else class="text-sm text-gray-500">
+                                            No hay fotos de visita de campo
+                                        </p>
                                     </AccordionContent>
                                 </AccordionItem>
                             </Accordion>

@@ -51,12 +51,16 @@ export const useAnalisisStore = defineStore(
             return response;
         }
 
+        async function descargarDocumento(id){
+            return await analisisService.descargarDocumento(id);
+        }
         return {
             loading,
             solicitudes,
             fetchSolicitudes,
             cambiarEstado,
-            rechazar
+            rechazar,
+            descargarDocumento
         };
     }
 );

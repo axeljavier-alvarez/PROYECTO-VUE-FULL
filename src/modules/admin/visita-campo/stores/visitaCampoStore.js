@@ -50,12 +50,16 @@ export const useVisitaCampoStore = defineStore(
                 loading.value = false;
             }
         }
+        async function descargarFoto(id){
+            return await visitaCampoService.descargarFoto(id);
+        }
 
         return {
             loading,
             solicitudes,
             fetchSolicitudes,
-            guardarVisita
+            guardarVisita,
+            descargarFoto
         }
     }
 );

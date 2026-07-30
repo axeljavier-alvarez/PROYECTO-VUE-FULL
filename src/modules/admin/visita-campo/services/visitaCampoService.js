@@ -27,5 +27,21 @@ export default {
                 }
             }
         );
+    },
+    async descargarFoto(id){
+        try {
+            const response = await apiClient.get(
+                `/solicitudes/documentos/${id}/download`,
+                {
+                    responseType: 'blob'
+                }
+            );
+            return response;
+        } catch(error){
+            console.log('Error al descargar la fotografía: ',
+                error.response?.data || error.message
+            );
+            throw error;
+        }
     }
 }

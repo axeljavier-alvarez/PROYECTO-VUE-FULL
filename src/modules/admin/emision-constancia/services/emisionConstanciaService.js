@@ -39,6 +39,22 @@ export default {
             );
             throw error;
         }
+    },
+    async descargarDocumento(id){
+        try {
+            const response = await apiClient.get(
+                `/solicitudes/documentos/${id}/download`,
+                {
+                    responseType: 'blob'
+                }
+            );
+            return response;
+        } catch(error){
+            console.log('Error al descargar el documento: ',
+                error.response?.data || error.message
+            );
+            throw error;
+        }
     }
     
 }

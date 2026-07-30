@@ -271,7 +271,8 @@ onMounted(async () => {
                         Observaciones
                      </label>
                      <div class="font-medium">
-                        {{ selectedSolicitud?.observaciones }}
+                        {{ selectedSolicitud?.observaciones 
+                        || 'El solicitante no ingresó observaciones.'}}
                      </div>
                   </div>
                </div>

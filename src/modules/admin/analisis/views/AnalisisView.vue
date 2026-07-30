@@ -73,11 +73,8 @@ function confirmarCambioEstado(estadoId, titulo, mensaje) {
 const motivoRechazo = ref('');
 // actualizar estado
 async function actualizarEstado() {
-
    try {
-
       if (accionSeleccionada.value.estadoId === 9) {
-
          await analisisStore.rechazar(
             selectedSolicitud.value.id,
             {
@@ -85,14 +82,11 @@ async function actualizarEstado() {
                descripcion: motivoRechazo.value
             }
          );
-
       } else {
-
          await analisisStore.cambiarEstado(
             selectedSolicitud.value.id,
             accionSeleccionada.value.estadoId
          );
-
       }
 
 
@@ -102,14 +96,13 @@ async function actualizarEstado() {
 
       motivoRechazo.value = '';
 
-   } catch(error){
+   } catch (error) {
 
       console.error(error);
 
    }
 
 }
-
 const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
    let resultado = solicitudes.value;
@@ -136,6 +129,24 @@ const filteredSolicitudes = computed(() => {
    }
    return resultado;
 });
+// descargar documento
+async function descargarDocumento(id, path) {
+   try {
+      const response = await analisisStore.descargarDocumento(id);
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement('a');
+      link.href = url;
+      // Obtener el nombre real del archivo
+      link.download = path.split('/').pop();
+      link.click();
+
+      window.URL.revokeObjectURL(url);
+   } catch (error) {
+      console.log(error);
+   }
+}
 onMounted(async () => {
    await analisisStore.fetchSolicitudes();
 })
@@ -348,10 +359,10 @@ onMounted(async () => {
                         Observaciones
                      </label>
                      <div class="font-medium">
-                        {{ selectedSolicitud?.observaciones }}
+                        {{ selectedSolicitud?.observaciones 
+                        || 'El solicitante no ingresó observaciones.'}}
                      </div>
                   </div>
-
                   <div class="mt-6">
                      <div class="flex items-center gap-2 mb-4">
                         <FileText class="w-5 h-5 text-blue-600" />
@@ -359,34 +370,26 @@ onMounted(async () => {
                            Documentos Adjuntos
                         </h3>
                      </div>
-
                      <div v-if="selectedSolicitud?.documentos?.length"
                         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         <div v-for="doc in selectedSolicitud.documentos" :key="doc.id"
                            class="border rounded-lg p-4 bg-gray-50 hover:shadow transition">
                            <div class="flex items-center justify-between">
-
                               <div class="flex items-center gap-2 min-w-0">
                                  <a :href="`http://127.0.0.1:8000/storage/${doc.path}`" target="_blank"
                                     class="text-blue-600 hover:text-blue-800" title="Ver documento">
                                     <Eye class="w-5 h-5" />
                                  </a>
-
                                  <span class="font-medium truncate">
                                     {{ doc.requisito?.nombre }}
                                  </span>
-
-                                 <a :href="`http://127.0.0.1:8000/storage/${doc.path}`"
-                                    :download="doc.requisito?.nombre" class="text-green-600 hover:text-green-800"
-                                    title="Descargar">
+                                 <Button variant="ghost" size="icon" @click="descargarDocumento(doc.id, doc.path)">
                                     <Download class="w-5 h-5" />
-                                 </a>
-
+                                 </Button>
                               </div>
                            </div>
                         </div>
                      </div>
-
                      <p v-else class="text-sm text-gray-500">
                         No hay documentos adjuntos.
                      </p>
@@ -405,12 +408,13 @@ onMounted(async () => {
                            <a :href="foto.url" target="_blank">
                               <img :src="foto.url" alt="Foto de visita" class="w-full h-52 object-cover" />
                            </a>
-                           <div class="p-2 flex justify-end">
-                              <a :href="foto.url" download class="text-green-600 hover:text-green-800"
-                                 title="Descargar">
-                                 <Download class="w-5 h-5" />
-                              </a>
-                           </div>
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              @click="descargarDocumento(foto.id, foto.path)"
+                           >
+                              <Download class="w-5 h-5" />
+                           </Button>
                         </div>
                      </div>
                      <p v-else class="text-sm text-gray-500">
@@ -422,8 +426,7 @@ onMounted(async () => {
                <!-- Footer -->
                <div class="border-t p-4 shrink-0">
                   <div class="flex flex-wrap justify-end gap-3">
-                     <Button variant="destructive"
-                        v-if="![3].includes(selectedSolicitud?.estado_id)"
+                     <Button variant="destructive" v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            9,
@@ -433,7 +436,6 @@ onMounted(async () => {
                         <CircleX class="w-4 h-4" />
                         Rechazar Solicitud
                      </Button>
-
                      <Button v-if="![3, 4].includes(selectedSolicitud?.estado_id)" variant="outline"
                         class="w-full sm:w-auto border-amber-600 text-amber-800 hover:bg-amber-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
@@ -444,9 +446,7 @@ onMounted(async () => {
                         <Search class="w-4 h-4" />
                         Inspección de Campo
                      </Button>
-
-                     <Button variant="outline"
-                        v-if="![3].includes(selectedSolicitud?.estado_id)"
+                     <Button variant="outline" v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto border-orange-600 text-orange-800 hover:bg-orange-50 flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            8,
@@ -456,9 +456,7 @@ onMounted(async () => {
                         <TriangleAlert class="w-4 h-4" />
                         Enviar a Previo
                      </Button>
-
-                     <Button
-                        v-if="![3].includes(selectedSolicitud?.estado_id)"
+                     <Button v-if="![3].includes(selectedSolicitud?.estado_id)"
                         class="w-full sm:w-auto bg-blue-900 hover:bg-blue-800 text-white flex items-center justify-center gap-2 uppercase font-semibold text-xs tracking-wider"
                         @click="confirmarCambioEstado(
                            5,
@@ -486,12 +484,8 @@ onMounted(async () => {
                   <label class="text-sm font-medium">
                      Motivo del rechazo
                   </label>
-                  <textarea
-                     v-model="motivoRechazo"
-                     rows="4"
-                     class="w-full border rounded-md p-3 mt-2"
-                     placeholder="Describa por qué se rechaza la solicitud"
-                  />
+                  <textarea v-model="motivoRechazo" rows="4" class="w-full border rounded-md p-3 mt-2"
+                     placeholder="Describa por qué se rechaza la solicitud" />
                </div>
                <DialogFooter class="mt-6">
                   <Button variant="outline" @click="confirmDialog = false">

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import solicitudService from '../services/emisionConstanciaService';
+import emisionConstanciaService from '../services/emisionConstanciaService';
 
 export const useEmisionConstanciaStore = defineStore(
     'emisionConstancia',
@@ -12,7 +12,7 @@ export const useEmisionConstanciaStore = defineStore(
             loading.value = true;
             try {
                 const response = 
-                await solicitudService.getSolicitudes(
+                await emisionConstanciaService.getSolicitudes(
                     filters
                 );
                 solicitudes.value =
@@ -23,23 +23,27 @@ export const useEmisionConstanciaStore = defineStore(
         }
 
         async function emitirConstancia(id) {
-            return await solicitudService.emitirConstancia(id);
+            return await emisionConstanciaService.emitirConstancia(id);
         }
 
         async function rechazar(id, data){
-            const response = await solicitudService.rechazarSolicitud(
+            const response = await emisionConstanciaService.rechazarSolicitud(
             id, data
             );
             await fetchSolicitudes();
             return response;
         }
 
+        async function descargarDocumento(id){
+            return await emisionConstanciaService.descargarDocumento(id);
+        }
         return {
             loading,
             solicitudes,
             fetchSolicitudes,
             emitirConstancia,
-            rechazar
+            rechazar,
+            descargarDocumento
         }
     }
 );
