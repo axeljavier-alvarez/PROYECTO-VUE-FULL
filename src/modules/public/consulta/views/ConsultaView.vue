@@ -4,11 +4,14 @@ import { Label } from '@/components/ui/label'
 import iconoMunicipalidad from '@/assets/images/icono_municipalidad.png'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-
+import { ref } from 'vue';
+import { useConsultaStore } from '../stores/consultaStore';
+const consultaStore = useConsultaStore();
+const cui = ref('');
+const noSolicitud = ref('');
 </script>
 <template>
     <div>
-
         <Card class="max-w-4xl mx-auto mt-5">
             <CardHeader>
                 <img :src="iconoMunicipalidad" class="mx-auto h-30 w-auto mb-4">
@@ -34,7 +37,6 @@ import { Button } from '@/components/ui/button'
                         </Label>
                         <Input placeholder="Ej: 1-2025"/>
                     </div>
-
                     <div class="grid md:grid-cols-2 gap-4">
                         <Button type="button">
                             Consultar ahora
@@ -45,8 +47,6 @@ import { Button } from '@/components/ui/button'
                     </div>
                 </form>
             </CardContent>
-
         </Card>
-
     </div>
 </template>
