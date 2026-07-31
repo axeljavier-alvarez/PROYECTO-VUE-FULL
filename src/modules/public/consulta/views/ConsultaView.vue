@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ref } from 'vue';
 import { useConsultaStore } from '../stores/consultaStore';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Check } from 'lucide-vue-next';
 const consultaStore = useConsultaStore();
 const cui = ref('');
 const noSolicitud = ref('');
@@ -39,7 +40,32 @@ const limitarCui = () => {
         .replace(/\D/g, '')
         .slice(0, 13);
 }
-
+const estados = [
+    {
+        id: 1,
+        nombre: 'Pendiente'
+    },
+    {
+        id: 2,
+        nombre: 'Analisis'
+    },
+    {
+        id: 5,
+        nombre: 'Por autorizar'
+    },
+    {
+        id: 6,
+        nombre: 'Emitido'
+    },
+    {
+        id: 7,
+        nombre: 'Autorizado'
+    }
+];
+function estadoCompletado(id){
+    const estadoActual = consultaStore.solicitud.estado_id;
+    return estadoActual >= id;
+}
 </script>
 <template>
     <div>
@@ -124,45 +150,46 @@ const limitarCui = () => {
                     </div>
                     <!-- PROGRESO -->
                     <div class="border rounded-lg p-4">
-                        <h3 class="font-bold text-lg mb-4">
+                        <h3 class="font-bold text-lg mb-6">
                             Progreso de la solicitud
                         </h3>
-                        <div class="flex justify-between items-center">
-
-                            <div class="text-center">
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                    1
-                                </div>
-                                <span class="text-sm">
-                                    Pendiente
+                        <div class="flex flex-wrap justify-center gap-6">
+                            <div 
+                                v-for="(estado,index) in estados"
+                                :key="estado.id"
+                                class="flex flex-col items-center relative"
+                            >
+                            <!-- linea -->
+                             <div 
+                             v-if="index < estados.length -1"
+                             class="hidden md:block absolute top-5 left-12 
+                             w-14 h-1" 
+                             :class="estadoCompletado(estados[index+1].id)
+                             ? 'bg-green-500'
+                             : 'bg-gray-200'">
+                             </div>
+                             <!-- circulo -->
+                              <div
+                              class="w-10 h-10 rounded-full flex items-center
+                              justify-center z-10"
+                              :class="estadoCompletado(estado.id)
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-200 text-gray-500'
+                              ">
+                                <Check v-if="estadoCompletado(estado.id)" class="w-5 h-5"/>
+                                <span v-else>
+                                    {{ index + 1 }}
                                 </span>
-                            </div>
-                            <div class="text-center">
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                    2
-                                </div>
-                                <span class="text-sm">
-                                    Análisis
-                                </span>
-                            </div>
-                            <div class="text-center">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center">
-                                    {{ consultaStore.solicitud.estado_id }}
-                                </div>
-
-                                <span class="text-sm">
-                                    Actual
-                                </span>
-                            </div>
-                            <div class="text-center">
-                                <div class="w-10 h-10 rounded-full bg-gray-200
-                                flex items-center justify-center">
-                                    5
-                                </div>
-                                <span class="text-sm">
-                                    Autorizado
-                                </span>
+                             </div>
+                             <span
+                             class="text-xs mt-2 text-center"
+                             :class="
+                             estadoCompletado(estado.id)
+                             ? 'text-green-600 font-semibold'
+                             : 'text-gray-500'
+                             ">
+                             {{ estado.nombre }}
+                             </span>
                             </div>
                         </div>
                     </div>
