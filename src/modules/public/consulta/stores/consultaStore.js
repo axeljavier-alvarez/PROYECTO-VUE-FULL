@@ -16,10 +16,8 @@ export const useConsultaStore = defineStore(
                 return true;
             } catch (err) {
                 error.value =
-                    err.response?.data?.message
-                    ?? 'No se encontró la solicitud';
-                solicitud.value = null;
-                return false;
+                    err.response?.data?.message ?? null;
+                throw err;
             } finally {
                 loading.value = false;
             }
