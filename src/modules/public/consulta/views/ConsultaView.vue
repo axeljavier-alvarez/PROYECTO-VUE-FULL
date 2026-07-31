@@ -63,8 +63,30 @@ const estados = [
     }
 ];
 function estadoCompletado(id){
-    const estadoActual = consultaStore.solicitud.estado_id;
-    return estadoActual >= id;
+    const estado = consultaStore.solicitud?.estado;
+    if(!estado) return false;
+    // Si está en visita asignada o visita realizada el progreso se queda en análisis
+    if (
+        estado.nombre === 'Visita asignada' ||
+        estado.nombre === 'Visita realizada'
+    ) {
+        return id <= 2;
+    }
+    return estado.id >= id;
+}
+function mensajeVisita() {
+    const nombre = consultaStore.solicitud?.estado?.nombre;
+
+    switch (nombre) {
+        case 'Visita asignada':
+            return 'La visita de campo ha sido asignada.';
+
+        case 'Visita realizada':
+            return 'La visita de campo ha sido completada satisfactoriamente.';
+
+        default:
+            return null;
+    }
 }
 </script>
 <template>
@@ -118,7 +140,7 @@ function estadoCompletado(id){
             </CardContent>
         </Card>
         <Dialog v-model:open="mostrarModal">
-            <DialogContent class="max-w-3xl">
+            <DialogContent class="max-w-3xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle class="text-2xl text-[#032C8F]">
                         Detalles de Consulta
@@ -139,7 +161,7 @@ function estadoCompletado(id){
                         </p>
                     </div>
                     <!-- ESTADO ACTUAL -->
-                    <div class="border rounded-lg p-4">
+                    <!-- <div class="border rounded-lg p-4">
                         <h3 class="font-bold text-lg mb-2">
                             Estado Actual
                         </h3>
@@ -147,7 +169,7 @@ function estadoCompletado(id){
                         text-blue-800">
                             {{ consultaStore.solicitud.estado.nombre }}
                         </span>
-                    </div>
+                    </div> -->
                     <!-- PROGRESO -->
                     <div class="border rounded-lg p-4">
                         <h3 class="font-bold text-lg mb-6">
@@ -196,11 +218,23 @@ function estadoCompletado(id){
                     <div class="bg-green-50 border border-green-200
                     rounded-lg p-4">
                         <p>
-                            La solicitud se encuentra actualmente en:
+                            Estado actual de su solicitud:
                             <strong>
                                 {{ consultaStore.solicitud.estado.nombre }}
                             </strong>
                         </p>
+                    </div>
+                    <div
+                    v-if="mensajeVisita()"
+                    class="mt-4 rounded-lg border border-blue-200
+                    bg-blue-50 p-4"
+                    >
+                    <p class="font-semibold text-blue-800">
+                        {{ consultaStore.solicitud.estado.nombre }}
+                    </p>
+                    <p class="text-sm text-blue-700 mt-1">
+                        {{ mensajeVisita() }}
+                    </p>
                     </div>
                 </div>
             </DialogContent>
