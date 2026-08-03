@@ -15,8 +15,12 @@ import { FileText, User, History } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const solicitudStore = useSolicitudStore();
-const { solicitudes, loading } = storeToRefs(solicitudStore);
+const { solicitudes, loading, currentPage, lastPage } = storeToRefs(solicitudStore);
 const search = ref('');
+// funcion para cambiar pagina
+async function cambiarPagina(page) {
+   await solicitudStore.fetchSolicitudes(page);
+}
 // para ver la solicitud en un modal
 const selectedSolicitud = ref(null);
 function verSolicitud(solicitud) {
@@ -25,16 +29,16 @@ function verSolicitud(solicitud) {
 }
 const filtroEstado = ref('todos');
 const filteredSolicitudes = computed(() => {
-    let resultado = solicitudes.value;
-    if (filtroEstado.value !== 'todos') {
-        resultado = resultado.filter(
-            solicitud =>
-                solicitud.estado_id === Number(filtroEstado.value)
-        );
-    }
-    if (search.value) {
-        resultado = resultado.filter(solicitud => {
-            const texto = `
+   let resultado = solicitudes.value;
+   if (filtroEstado.value !== 'todos') {
+      resultado = resultado.filter(
+         solicitud =>
+            solicitud.estado_id === Number(filtroEstado.value)
+      );
+   }
+   if (search.value) {
+      resultado = resultado.filter(solicitud => {
+         const texto = `
             ${solicitud.no_solicitud}
             ${solicitud.nombres}
             ${solicitud.apellidos}
@@ -42,12 +46,12 @@ const filteredSolicitudes = computed(() => {
             ${solicitud.estado?.nombre}
             ${solicitud.tramite?.nombre}
             `.toLowerCase();
-            return texto.includes(
-                search.value.toLowerCase()
-            );
-        });
-    }
-    return resultado;
+         return texto.includes(
+            search.value.toLowerCase()
+         );
+      });
+   }
+   return resultado;
 });
 onMounted(async () => {
    //  console.log('COMPONENTE MONTADO');
@@ -58,7 +62,7 @@ onMounted(async () => {
    <Card>
       <CardContent class="p-6">
          <div class="flex gap-4 mb-4">
-            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1"/>
+            <Input v-model="search" placeholder="Buscar solicitud..." class="flex-1" />
             <Select v-model="filtroEstado">
                <SelectTrigger class="w-[220px]">
                   <SelectValue placeholder="Filtrar por estado" />
@@ -152,9 +156,17 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
+         <div class="flex items-center justify-end gap-2 mt-4">
+            <Button variant="outline" :disabled="currentPage === 1" @click="cambiarPagina(currentPage - 1)">
+               Anterior
+            </Button>
+            <span>Página {{ currentPage }} de {{ lastPage }}</span>
+            <Button variant="outline" :disabled="currentPage === lastPage" @click="cambiarPagina(currentPage + 1)">
+               Siguiente
+            </Button>
+         </div>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
-
                <!-- Encabezado -->
                <div class="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
                   <div class="flex items-center gap-3">
@@ -186,7 +198,6 @@ onMounted(async () => {
                            <label class="text-xs text-gray-400">
                               NOMBRE COMPLETO
                            </label>
-
                            <div class="font-medium">
                               {{ selectedSolicitud?.nombres }}
                               {{ selectedSolicitud?.apellidos }}
@@ -271,8 +282,8 @@ onMounted(async () => {
                         Observaciones
                      </label>
                      <div class="font-medium">
-                        {{ selectedSolicitud?.observaciones 
-                        || 'El solicitante no ingresó observaciones.'}}
+                        {{ selectedSolicitud?.observaciones
+                           || 'El solicitante no ingresó observaciones.' }}
                      </div>
                   </div>
                </div>

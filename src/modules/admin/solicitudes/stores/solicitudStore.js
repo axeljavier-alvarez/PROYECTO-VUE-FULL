@@ -20,25 +20,15 @@ export const useSolicitudStore = defineStore(
          * desde la API.
          */
         const solicitudes = ref([]);
-
-        /**
-         * Obtiene las solicitudes desde
-         * el servicio y actualiza el estado.
-         *
-         * @param {Object} filters
-         * Filtros opcionales enviados al backend.
-         */
-        async function fetchSolicitudes(filters = {}) {
-
+        const currentPage = ref(1);
+        const lastPage = ref(1);
+        const total = ref(0);
+        async function fetchSolicitudes(page = 1) {
             loading.value = true;
-
             try {
-
-                const response =
-                    await solicitudService.getSolicitudes(
-                        filters
-                    );
-
+                const response = await solicitudService.getSolicitudes({
+                page
+            });
                 /**
                  * Algunas APIs devuelven:
                  * { data: [...] }
@@ -48,8 +38,11 @@ export const useSolicitudStore = defineStore(
                  *
                  * Se contempla ambos casos.
                  */
-                solicitudes.value =
-                    response.data || response;
+                solicitudes.value = response.data;
+
+                currentPage.value = response.meta.current_page;
+                lastPage.value = response.meta.last_page;
+                total.value = response.meta.total;
 
             } finally {
                 loading.value = false;
@@ -57,11 +50,12 @@ export const useSolicitudStore = defineStore(
         }
 
         return {
-
             loading,
             solicitudes,
+            currentPage,
+            lastPage,
+            total,
             fetchSolicitudes
-
         };
     }
 );
