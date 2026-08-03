@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 // instancia del store encargado de administrar las solicitudes de análisis
 const analisisStore = useAnalisisStore();
-const { solicitudes, loading } = storeToRefs(analisisStore);
+const { solicitudes, loading, currentPage, lastPage } = storeToRefs(analisisStore);
 const search = ref('');
 const selectedSolicitud = ref(null);
 // confirmar dialog
@@ -38,7 +38,10 @@ const accionSeleccionada = ref({
 
 // duracion mensaje
 const mostrarMensajeAnalisis = ref(false);
-
+// funcion para cambiar pagina
+async function cambiarPagina(page) {
+   await analisisStore.fetchSolicitudes(page);
+}
 // ver soliicitudes y cambiar estado
 async function verSolicitud(solicitud) {
    if (solicitud.estado_id === 1) {
@@ -234,6 +237,15 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
+         <div class="flex items-center justify-end gap-2 mt-4">
+            <Button variant="outline" :disabled="currentPage === 1" @click="cambiarPagina(currentPage - 1)">
+               Anterior
+            </Button>
+            <span>Página {{ currentPage }} de {{ lastPage }}</span>
+            <Button variant="outline" :disabled="currentPage === lastPage" @click="cambiarPagina(currentPage + 1)">
+               Siguiente
+            </Button>
+         </div>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
                <!-- Encabezado -->

@@ -14,20 +14,21 @@ export const useAnalisisStore = defineStore(
         3. Guarda las solicitudes en el estado reactivo
         4. Desactiva el indicador de carga
         */
-        async function fetchSolicitudes(filters = {}) {
+       const currentPage = ref(1);
+       const lastPage = ref(1);
+       const total = ref(0);
+        async function fetchSolicitudes(page = 1) {
             loading.value = true;
             try {
-                const response =
-                    await analisisService.getSolicitudes(
-                        filters
-                    );
-
-                solicitudes.value =
-                    response.data.data ?? response.data ?? response;
+                const response = await analisisService.getSolicitudes({
+                page
+            });
+                solicitudes.value = response.data;
+                currentPage.value = response.meta.current_page;
+                lastPage.value = response.meta.last_page;
+                total.value = response.meta.total;                
             } finally {
-
                 loading.value = false;
-
             }
         }
         /* Cambiar estado de solicitud 
@@ -57,6 +58,9 @@ export const useAnalisisStore = defineStore(
         return {
             loading,
             solicitudes,
+            currentPage,
+            lastPage,
+            total,
             fetchSolicitudes,
             cambiarEstado,
             rechazar,
