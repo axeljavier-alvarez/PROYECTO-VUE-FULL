@@ -159,17 +159,7 @@ function mensajeVisita() {
                             {{ consultaStore.solicitud.nombres }}
                             {{ consultaStore.solicitud.apellidos }}
                         </p>
-                    </div>
-                    <!-- ESTADO ACTUAL -->
-                    <!-- <div class="border rounded-lg p-4">
-                        <h3 class="font-bold text-lg mb-2">
-                            Estado Actual
-                        </h3>
-                        <span class="px-3 py-1 rounded bg-blue-100
-                        text-blue-800">
-                            {{ consultaStore.solicitud.estado.nombre }}
-                        </span>
-                    </div> -->
+                    </div>                   
                     <!-- PROGRESO -->
                     <div class="border rounded-lg p-4">
                         <h3 class="font-bold text-lg mb-6">

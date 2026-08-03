@@ -126,7 +126,6 @@ watch(
                 <CardTitle class="text-3xl text-center font-bold text-[#032C8F]">
                     Constancia de Residencia
                 </CardTitle>
-
                 <CardDescription class="text-center text-base mt-2">
                     Complete la información requerida para registrar su solicitud
                 </CardDescription>
@@ -149,7 +148,6 @@ watch(
                 class="mx-6 rounded-md bg-[#FEF9C3] text-[#DD3426] text-base py-2 px-4 text-center">
                 Ingrese los nombres y apellidos tal como aparecen en el DPI
             </CardDescription>
-
             <CardContent>
                 <form class="grid gap-6" @submit.prevent>
                     <!-- VALIDACION PASO 1 -->
@@ -269,7 +267,7 @@ watch(
                                 </p>
                             </div>
 
-                            <div v-if="store.form.tramite_id" class="grid gap-2 mt-4">
+                            <div v-if="store.form.tramite_id && store.form.tramite_id !== '0'" class="grid gap-2 mt-4">
                                 <Label>
                                     {{ tituloRazon }}
                                 </Label>
@@ -279,7 +277,7 @@ watch(
                                     {{ store.errors.razon[0] }}
                                 </p>
                             </div>
-                            <div>
+                            <div v-if="store.form.tramite_id && store.form.tramite_id !== '0'">
                                 <Label class="mt-5 mb-2 flex justify-center text-2xl font-bold text-[#0D057F]">
                                     REQUISITOS
                                 </Label>
