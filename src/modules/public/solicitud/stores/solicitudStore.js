@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import solicitudService from '../services/solicitudService';
-export const useSolicitudStore = defineStore('solicitud', ()=> {
+export const useSolicitudStore = defineStore('solicitud', () => {
     const loading = ref(false);
     const errors = ref({});
     const tramites = ref([]);
@@ -15,51 +15,101 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
         observaciones: '',
         razon: '',
         zona: '',
-        tramite_id: ''
+        tramite_id: '',
+        tiene_dependientes: '',
+        dependientes: [
+            {
+                nombres: '',
+                apellidos: ''
+            }
+        ]
     });
     const archivos = ref({})
-    async function fetchTramites(){
+    async function fetchTramites() {
         try {
             const response = await solicitudService.getAll();
             // Si Laravel mandó la colección envuelta, se toma response.data, si no, la response directa
             tramites.value = response.data || response;
-        } catch(error){
+        } catch (error) {
             console.error('Error al cargar trámites en el store:', error);
         }
     }
-    async function createSolicitud(){
+    async function createSolicitud() {
         loading.value = true;
         errors.value = {};
+
         try {
             const formData = new FormData();
-            Object.keys(form.value).forEach(key => {
-                const valor = form.value[key];
-                if (valor !== '' && valor !== null && valor !== undefined) {
-                    formData.append(key, valor);
-                }
-            });
-            // meter archivos adjuntos en paso 2
-            const mapeoArchivos = archivos.value;
-            Object.keys(mapeoArchivos).forEach(campo => {
-                const archivo = mapeoArchivos[campo];
-                if(archivo instanceof File){
-                    formData.append(campo, archivo); 
-                }
-            });
-            
-            return await solicitudService.create(formData)
-        } catch(error) {
 
-            if (error.response?.status === 422){
+            Object.keys(form.value).forEach(key => {
+
+                const valor = form.value[key];
+
+                // Si es un array (dependientes)
+                if (Array.isArray(valor)) {
+
+                    valor.forEach((item, index) => {
+
+                        Object.keys(item).forEach(campo => {
+
+                            formData.append(
+                                `${key}[${index}][${campo}]`,
+                                item[campo]
+                            );
+
+                        });
+
+                    });
+
+                } else {
+
+                    if (valor !== '' && valor !== null && valor !== undefined) {
+
+                        formData.append(key, valor);
+
+                    }
+
+                }
+
+            });
+
+
+            // Archivos
+            const mapeoArchivos = archivos.value;
+
+            Object.keys(mapeoArchivos).forEach(campo => {
+
+                const archivo = mapeoArchivos[campo];
+
+                if (archivo instanceof File) {
+
+                    formData.append(campo, archivo);
+
+                }
+
+            });
+
+
+            return await solicitudService.create(formData);
+
+        } catch (error) {
+
+            if (error.response?.status === 422) {
+
                 errors.value = error.response.data.errors;
+
             }
-            throw error
+
+            throw error;
+
         } finally {
+
             loading.value = false;
+
         }
     }
 
-    async function validarPaso(step){
+    async function validarPaso(step) {
         loading.value = true;
         errors.value = {}; // limpiar errores paso anterior
         try {
@@ -68,15 +118,26 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
             formData.append('step', step)
             Object.keys(form.value).forEach(key => {
                 const valor = form.value[key];
-                if(valor !== '' && valor !== null && valor !== undefined){
-                    formData.append(key, valor);
+                if (Array.isArray(valor)) {
+                    valor.forEach((item, index) => {
+                        Object.keys(item).forEach(campo => {
+                            formData.append(
+                                `${key}[${index}][${campo}]`,
+                                item[campo]
+                            );
+                        });
+                    });
+                } else {
+                    if (valor !== '' && valor !== null && valor !== undefined) {
+                        formData.append(key, valor);
+                    }
                 }
             });
             // archivos asegurando que no se mezcle con cosas externas
             const mapeoArchivos = archivos.value;
             Object.keys(mapeoArchivos).forEach(campo => {
                 const archivo = mapeoArchivos[campo];
-                if(archivo instanceof File){
+                if (archivo instanceof File) {
                     formData.append(campo, archivo);
                 }
             });
@@ -84,22 +145,22 @@ export const useSolicitudStore = defineStore('solicitud', ()=> {
             // const data = { step, ...form.value };
             await solicitudService.validarPaso(formData);
             return true;
-        }catch(error){
-            if(error.response?.status === 422){
+        } catch (error) {
+            if (error.response?.status === 422) {
                 errors.value = error.response.data.errors;
             }
             return false;
-        }finally {
+        } finally {
             loading.value = false;
         }
     }
 
     return {
-        form, 
+        form,
         loading,
         createSolicitud,
         errors,
-        tramites, 
+        tramites,
         fetchTramites,
         validarPaso,
         archivos

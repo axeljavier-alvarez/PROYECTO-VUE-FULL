@@ -292,24 +292,79 @@ watch(
                                 class="mt-4 space-y-2">
                                 <!-- Recorre arreglo de requisito de trámite seleccionado y genera bloque por cada requisito -->
                                 <div
-                                v-for="requisito in tramiteSeleccionado.requisitos"
+                                v-for="requisito in tramiteSeleccionado.requisitos.filter(r => r.nombre.toLowerCase() !== 'cargas familiares')"                                
                                 :key="requisito.id"
                                 class="p-3 border rounded-md bg-gray-50">
-                                <Label>
-                                    {{ requisito.nombre }}
-                                </Label>
-                                <!-- nombre de requisito -->
-                                <Input 
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                @change="guardarArchivo($event, requisito.id)"/>
-                                <p
-                                v-if="store.errors?.[`requisito_${requisito.id}`]"
-                                class="text-sm text-red-500 mt-1">
-                                {{ store.errors[`requisito_${requisito.id}`][0] }}
-                                </p>
+                                    <Label>
+                                        {{ requisito.nombre }}
+                                        <span v-if="requisito.id === 1"
+                                        class="font-bold">
+                                        (opcional)
+                                        </span>
+                                    </Label>
+                                    <!-- nombre de requisito -->
+                                    <Input 
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    @change="guardarArchivo($event, requisito.id)"/>
+                                    <p
+                                    v-if="store.errors?.[`requisito_${requisito.id}`]"
+                                    class="text-sm text-red-500 mt-1">
+                                    {{ store.errors[`requisito_${requisito.id}`][0] }}
+                                    </p>
                                 </div>
+                                <!-- CARGAS FAMILIARES -->
+                                    <div v-for="requisito in
+                                    tramiteSeleccionado.requisitos.filter(r =>
+                                        r.nombre.toLowerCase() === 'cargas familiares'
+                                    )"
+                                    :key="requisito.id"
+                                        class="p-3 border rounded-md bg-gray-50"
+                                    >
+                                        <Label>
+                                            {{ requisito.nombre }}
+                                        </Label>
+                                        <Label class="mt-3">
+                                            ¿Tiene dependientes?
+                                        </Label>                                
+                                        <Select v-model="store.form.tiene_dependientes">
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Seleccione una opción"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="1">Sí</SelectItem>
+                                                    <SelectItem value="0">No</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <p
+                                            v-if="store.errors?.tiene_dependientes"
+                                            class="text-sm text-red-500 mt-1"
+                                        >
+                                            {{ store.errors.tiene_dependientes[0] }}
+                                        </p>
+                                    </div>
+                                    <!-- DATOS DEL DEPENDIENTE -->
+                                    <div
+                                    v-if="store.form.tiene_dependientes === '1'"
+                                    class="mt-4 space-y-3">
+                                        <label>
+                                            Datos del dependiente
+                                        </label>
+                                        <Input 
+                                        v-model="store.form.dependientes[0].nombres"
+                                        placeholder="Nombres" />
+                                        
+                                        <Input 
+                                        v-model="store.form.dependientes[0].apellidos"
+                                        placeholder="Apellidos" />
+                                        
+                                    </div>
+
                                 </div>
+
+
                             </div>
                         </div>
                     </div>

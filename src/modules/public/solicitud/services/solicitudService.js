@@ -37,7 +37,6 @@ export default {
                 '/solicitudes/validar-paso',
                 data,
                 {
-                    // 🚀 AQUÍ ESTÁ EL TRUCO: Sobreescribimos el JSON global
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
