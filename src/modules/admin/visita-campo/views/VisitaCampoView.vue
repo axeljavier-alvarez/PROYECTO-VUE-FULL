@@ -30,7 +30,10 @@ const visitaCampoStore = useVisitaCampoStore();
 // extraer propiedades reactivas de store, 
 // solicitudes: listado obtenido desde el back
 // loading: indicador de carga durante las peticiones
-const { solicitudes, loading } = storeToRefs(visitaCampoStore);
+const { solicitudes, loading, currentPage, lastPage } = storeToRefs(visitaCampoStore);
+async function cambiarPagina(page) {
+    await visitaCampoStore.fetchSolicitudes(page);
+}
 /* texto utilizado para filtrar las solicitudes por número 
 nombre, apellido, cui, estado o trámite*/
 const search = ref('');
@@ -286,6 +289,15 @@ onMounted(async () => {
                     </TableRow>
                 </TableBody>
             </Table>
+            <div class="flex items-center justify-end gap-2 mt-4">
+                <Button variant="outline" :disabled="currentPage === 1" @click="cambiarPagina(currentPage - 1)">
+                Anterior
+                </Button>
+                <span>Página {{ currentPage }} de {{ lastPage }}</span>
+                <Button variant="outline" :disabled="currentPage === lastPage" @click="cambiarPagina(currentPage + 1)">
+                Siguiente
+                </Button>
+            </div>
             <!-- visualizar la información de una solicitud -->
             <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
                 <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">

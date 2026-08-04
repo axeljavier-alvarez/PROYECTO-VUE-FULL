@@ -21,9 +21,9 @@ export const useVisitaCampoStore = defineStore(
             try {
                 // petición al back mediante service 
                 const response =
-                    await visitaCampoService.getSolicitudes(
+                    await visitaCampoService.getSolicitudes({
                         page
-                    );
+                    });
                     /* guarda solicitudes en estado store, 
                     se utiliza operador ?? estructura varia según el endpoint */
                     /* response.data.data -> API devuelve recursos paginados 
@@ -59,10 +59,12 @@ export const useVisitaCampoStore = defineStore(
         async function descargarFoto(id){
             return await visitaCampoService.descargarFoto(id);
         }
-
         return {
             loading,
             solicitudes,
+            currentPage,
+            lastPage,
+            total,
             fetchSolicitudes,
             guardarVisita,
             descargarFoto

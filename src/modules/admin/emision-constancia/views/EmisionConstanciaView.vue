@@ -23,9 +23,13 @@ import {
    AccordionTrigger
 } from '@/components/ui/accordion';
 const solicitudStore = useEmisionConstanciaStore();
-const { solicitudes, loading } = storeToRefs(solicitudStore);
+const { solicitudes, loading, currentPage, lastPage } = storeToRefs(solicitudStore);
 const search = ref('');
 const selectedSolicitud = ref(null);
+async function cambiarPagina(page) {
+   await solicitudStore.fetchSolicitudes(page);
+}
+
 function verSolicitud(solicitud) {
    console.log(solicitud.constancia);
    selectedSolicitud.value = solicitud;
@@ -230,6 +234,15 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
+         <div class="flex items-center justify-end gap-2 mt-4">
+            <Button variant="outline" :disabled="currentPage === 1" @click="cambiarPagina(currentPage - 1)">
+               Anterior
+            </Button>
+            <span>Página {{ currentPage }} de {{ lastPage }}</span>
+            <Button variant="outline" :disabled="currentPage === lastPage" @click="cambiarPagina(currentPage + 1)">
+               Siguiente
+            </Button>
+         </div>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
                <!-- Encabezado -->

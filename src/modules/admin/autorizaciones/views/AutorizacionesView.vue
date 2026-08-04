@@ -13,9 +13,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { FileText, User, History, Eye, Download, File, CircleX, Search, TriangleAlert, FileCheck, XCircle, CheckCircle } from 'lucide-vue-next'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 const solicitudStore = useSolicitudStore();
-const { solicitudes, loading } = storeToRefs(solicitudStore);
+const { solicitudes, loading, currentPage, lastPage } = storeToRefs(solicitudStore);
 const search = ref('');
+async function cambiarPagina(page){
+   await solicitudStore.fetchSolicitudes(page);
+}
 const selectedSolicitud = ref(null);
 function verSolicitudes(solicitud) {
    console.log(solicitud);
@@ -236,6 +240,15 @@ onMounted(async () => {
                </TableRow>
             </TableBody>
          </Table>
+         <div class="flex items-center justify-end gap-2 mt-4">
+            <Button variant="outline" :disabled="currentPage === 1" @click="cambiarPagina(currentPage - 1)">
+               Anterior
+            </Button>
+            <span>Página {{ currentPage }} de {{ lastPage }}</span>
+            <Button variant="outline" :disabled="currentPage === lastPage" @click="cambiarPagina(currentPage + 1)">
+               Siguiente
+            </Button>
+         </div>
          <Dialog :open="!!selectedSolicitud" @update:open="selectedSolicitud = null">
             <DialogContent class="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden gap-0">
 

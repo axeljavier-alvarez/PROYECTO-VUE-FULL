@@ -3,18 +3,14 @@ import { ref } from 'vue';
 import solicitudService from '../services/solicitudService';
 
 export const useSolicitudStore = defineStore(
-
     'solicitudes',
-
     () => {
-
         /**
          * Estado de carga.
          * Se utiliza para mostrar spinners
          * o indicadores de carga.
          */
         const loading = ref(false);
-
         /**
          * Listado de solicitudes obtenido
          * desde la API.
@@ -43,12 +39,10 @@ export const useSolicitudStore = defineStore(
                 currentPage.value = response.meta.current_page;
                 lastPage.value = response.meta.last_page;
                 total.value = response.meta.total;
-
             } finally {
                 loading.value = false;
             }
         }
-
         return {
             loading,
             solicitudes,
