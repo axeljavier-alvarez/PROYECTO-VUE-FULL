@@ -266,7 +266,6 @@ watch(
                                     {{ store.errors.tramite_id[0] }}
                                 </p>
                             </div>
-
                             <div v-if="store.form.tramite_id && store.form.tramite_id !== '0'" class="grid gap-2 mt-4">
                                 <Label>
                                     {{ tituloRazon }}
@@ -281,7 +280,6 @@ watch(
                                 <Label class="mt-5 mb-2 flex justify-center text-2xl font-bold text-[#0D057F]">
                                     REQUISITOS
                                 </Label>
-
                                 <CardDescription v-if="currentStep === 1"
                                     class="mx-6 rounded-md bg-[#EFF6FF] text-[#030EA7] text-base py-2 px-4 text-center">
                                     Recuerde que puede subir únicamente documentos PDF o JPG
@@ -355,16 +353,24 @@ watch(
                                         <Input 
                                         v-model="store.form.dependientes[0].nombres"
                                         placeholder="Nombres" />
-                                        
+                                        <p
+                                        v-if="store.errors?.['dependientes.0.nombres']"
+                                        class="text-sm text-red-500 mt-1"
+                                        >
+                                            {{ store.errors[`dependientes.0.nombres`][0] }}
+                                        </p>
                                         <Input 
                                         v-model="store.form.dependientes[0].apellidos"
-                                        placeholder="Apellidos" />
-                                        
+                                        placeholder="Apellidos" />   
+                                         <p
+                                        v-if="store.errors?.['dependientes.0.apellidos']"
+                                        class="text-sm text-red-500 mt-1"
+                                        >
+                                            {{ store.errors[`dependientes.0.apellidos`][0] }}
+                                        </p>
+
                                     </div>
-
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
