@@ -362,7 +362,8 @@ watch(
                                         <Input 
                                         v-model="store.form.dependientes[0].apellidos"
                                         placeholder="Apellidos" />   
-                                         <p
+             
+                                        <p
                                         v-if="store.errors?.['dependientes.0.apellidos']"
                                         class="text-sm text-red-500 mt-1"
                                         >
