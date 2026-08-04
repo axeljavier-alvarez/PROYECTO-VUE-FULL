@@ -9,24 +9,30 @@ export const useVisitaCampoStore = defineStore(
         const loading = ref(false);
         // actualizar solicitudes
         const solicitudes = ref([]);
+        
+        const currentPage = ref(1);
+        const lastPage = ref(1);
+        const total = ref(0);
         /* VER SOLICITUDES filters: objeto opcional con filtros de búsqueda
         estado, página, nombre, etc */
-        async function fetchSolicitudes(filters = {}) {
+        async function fetchSolicitudes(page = 1) {
             // activa estado de carga
             loading.value = true;
             try {
                 // petición al back mediante service 
                 const response =
                     await visitaCampoService.getSolicitudes(
-                        filters
+                        page
                     );
                     /* guarda solicitudes en estado store, 
                     se utiliza operador ?? estructura varia según el endpoint */
                     /* response.data.data -> API devuelve recursos paginados 
                        response.data -> Devuelve un objeto JSON 
                        response -> último respaldo*/
-                solicitudes.value =
-                    response.data.data ?? response.data ?? response;
+                    solicitudes.value = response.data;
+                    currentPage.value = response.meta.current_page;
+                    lastPage.value = response.meta.last_page;
+                    total.value = response.meta.total;
             } finally {
                 // finaliza estado carga
                 loading.value = false;
