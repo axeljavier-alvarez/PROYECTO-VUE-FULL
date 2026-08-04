@@ -24,7 +24,18 @@ export const useSolicitudStore = defineStore('solicitud', () => {
             }
         ]
     });
-    const archivos = ref({})
+    const archivos = ref({});
+    function agregarDependiente(){
+        if(form.value.dependientes.length >= 4) return;
+        form.value.dependientes.push({
+            nombres: '',
+            apellidos: ''
+        });
+    }
+    function eliminarDependiente(index) {
+        if (form.value.dependientes.length === 1) return;
+        form.value.dependientes.splice(index, 1);
+    }
     async function fetchTramites() {
         try {
             const response = await solicitudService.getAll();
@@ -163,6 +174,8 @@ export const useSolicitudStore = defineStore('solicitud', () => {
         tramites,
         fetchTramites,
         validarPaso,
-        archivos
+        archivos,
+        agregarDependiente,
+        eliminarDependiente
     }
 });

@@ -285,49 +285,38 @@ watch(
                                     Recuerde que puede subir únicamente documentos PDF o JPG
                                 </CardDescription>
                                 <!-- Se muestra cuando existe trámite seleccionado y el trámite tiene un requisito -->
-                                <div
-                                v-if="tramiteSeleccionado?.requisitos?.length"
-                                class="mt-4 space-y-2">
-                                <!-- Recorre arreglo de requisito de trámite seleccionado y genera bloque por cada requisito -->
-                                <div
-                                v-for="requisito in tramiteSeleccionado.requisitos.filter(r => r.nombre.toLowerCase() !== 'cargas familiares')"                                
-                                :key="requisito.id"
-                                class="p-3 border rounded-md bg-gray-50">
-                                    <Label>
-                                        {{ requisito.nombre }}
-                                        <span v-if="requisito.id === 1"
-                                        class="font-bold">
-                                        (opcional)
-                                        </span>
-                                    </Label>
-                                    <!-- nombre de requisito -->
-                                    <Input 
-                                    type="file"
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    @change="guardarArchivo($event, requisito.id)"/>
-                                    <p
-                                    v-if="store.errors?.[`requisito_${requisito.id}`]"
-                                    class="text-sm text-red-500 mt-1">
-                                    {{ store.errors[`requisito_${requisito.id}`][0] }}
-                                    </p>
-                                </div>
-                                <!-- CARGAS FAMILIARES -->
+                                <div v-if="tramiteSeleccionado?.requisitos?.length" class="mt-4 space-y-2">
+                                    <!-- Recorre arreglo de requisito de trámite seleccionado y genera bloque por cada requisito -->
+                                    <div v-for="requisito in tramiteSeleccionado.requisitos.filter(r => r.nombre.toLowerCase() !== 'cargas familiares')"
+                                        :key="requisito.id" class="p-3 border rounded-md bg-gray-50">
+                                        <Label>
+                                            {{ requisito.nombre }}
+                                            <span v-if="requisito.id === 1" class="font-bold">
+                                                (opcional)
+                                            </span>
+                                        </Label>
+                                        <!-- nombre de requisito -->
+                                        <Input type="file" accept=".pdf,.jpg,.jpeg,.png"
+                                            @change="guardarArchivo($event, requisito.id)" />
+                                        <p v-if="store.errors?.[`requisito_${requisito.id}`]"
+                                            class="text-sm text-red-500 mt-1">
+                                            {{ store.errors[`requisito_${requisito.id}`][0] }}
+                                        </p>
+                                    </div>
+                                    <!-- CARGAS FAMILIARES -->
                                     <div v-for="requisito in
-                                    tramiteSeleccionado.requisitos.filter(r =>
-                                        r.nombre.toLowerCase() === 'cargas familiares'
-                                    )"
-                                    :key="requisito.id"
-                                        class="p-3 border rounded-md bg-gray-50"
-                                    >
+                                        tramiteSeleccionado.requisitos.filter(r =>
+                                            r.nombre.toLowerCase() === 'cargas familiares'
+                                        )" :key="requisito.id" class="p-3 border rounded-md bg-gray-50">
                                         <Label>
                                             {{ requisito.nombre }}
                                         </Label>
                                         <Label class="mt-3">
                                             ¿Tiene dependientes?
-                                        </Label>                                
+                                        </Label>
                                         <Select v-model="store.form.tiene_dependientes">
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Seleccione una opción"/>
+                                                <SelectValue placeholder="Seleccione una opción" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
@@ -336,46 +325,61 @@ watch(
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        <p
-                                            v-if="store.errors?.tiene_dependientes"
-                                            class="text-sm text-red-500 mt-1"
-                                        >
+                                        <p v-if="store.errors?.tiene_dependientes" class="text-sm text-red-500 mt-1">
                                             {{ store.errors.tiene_dependientes[0] }}
                                         </p>
                                     </div>
                                     <!-- DATOS DEL DEPENDIENTE -->
-                                    <div
-                                    v-if="store.form.tiene_dependientes === '1'"
-                                    class="mt-4 space-y-3">
-                                        <label>
-                                            Datos del dependiente
-                                        </label>
+                                    <div v-if="store.form.tiene_dependientes === '1'" class="mt-4 space-y-3">
+                                        <div
+                                        v-for="(dependiente, index) in store.form.dependientes"
+                                        :key="index"
+                                        class="border rounded-lg p-4 space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <Label>
+                                                Dependiente {{ index + 1 }}
+                                            </Label>
+                                            <Button
+                                            v-if="store.form.dependientes.length > 1"
+                                            type="button"
+                                            variant="destructive"
+                                            @click="store.eliminarDependiente(index)">
+                                            Eliminar
+                                            </Button>
+                                        </div>
                                         <Input 
-                                        v-model="store.form.dependientes[0].nombres"
-                                        placeholder="Nombres" />
+                                        v-model="dependiente.nombres"
+                                        placeholder="Nombres"
+                                        />
                                         <p
-                                        v-if="store.errors?.['dependientes.0.nombres']"
-                                        class="text-sm text-red-500 mt-1"
+                                            v-if="store.errors?.[`dependientes.${index}.nombres`]"
+                                            class="text-sm text-red-500"
                                         >
-                                            {{ store.errors[`dependientes.0.nombres`][0] }}
+                                            {{ store.errors[`dependientes.${index}.nombres`][0] }}
                                         </p>
                                         <Input 
-                                        v-model="store.form.dependientes[0].apellidos"
-                                        placeholder="Apellidos" />   
-             
+                                        v-model="dependiente.apellidos"
+                                        placeholder="Apellidos"
+                                        />
                                         <p
-                                        v-if="store.errors?.['dependientes.0.apellidos']"
-                                        class="text-sm text-red-500 mt-1"
+                                        v-if="store.errors?.[`dependientes.${index}.apellidos`]"
+                                        class="text-sm text-red-500"
                                         >
-                                            {{ store.errors[`dependientes.0.apellidos`][0] }}
+                                            {{ store.errors[`dependientes.${index}.apellidos`][0] }}
                                         </p>
-
+                                        </div>
+                                        <Button
+                                        v-if="store.form.dependientes.length < 4"
+                                        type="button"
+                                        @click="store.agregarDependiente()">
+                                        + Agregar Dependiente
+                                        </Button>
+                                        
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div v-if="currentStep === 3" class="grid gap-6">
                         <div class="grid gap-2">
                             <Label>
@@ -384,7 +388,6 @@ watch(
                             <Textarea v-model="store.form.observaciones" placeholder="Ingrese las observaciones" />
                         </div>
                     </div>
-
                     <div class="flex justify-between items-center mt-4 pt-4 border-t">
                         <Button type="button" variant="outline" @click="regresarPaso"
                             :disabled="currentStep === 1 || store.loading">
