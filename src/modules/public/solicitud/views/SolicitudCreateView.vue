@@ -91,6 +91,12 @@ const confirmarEnvio = async () => {
         console.error(error)
     }
 }
+const guardarArchivoDependiente = (event, index) => {
+    const archivo = event.target.files[0]
+    if(archivo){
+        store.form.dependientes[index].archivo = archivo
+    }
+}
 // computed que obtiene automaticamente el tramite seleccionado
 // cada vez que cambia store.form.tramite_id
 const tramiteSeleccionado = computed(() => {
@@ -334,38 +340,48 @@ watch(
                                         v-for="(dependiente, index) in store.form.dependientes"
                                         :key="index"
                                         class="border rounded-lg p-4 space-y-3">
-                                        <div class="flex justify-between items-center">
-                                            <Label>
-                                                Dependiente {{ index + 1 }}
-                                            </Label>
-                                            <Button
-                                            v-if="store.form.dependientes.length > 1"
-                                            type="button"
-                                            variant="destructive"
-                                            @click="store.eliminarDependiente(index)">
-                                            Eliminar
-                                            </Button>
-                                        </div>
-                                        <Input 
-                                        v-model="dependiente.nombres"
-                                        placeholder="Nombres"
-                                        />
-                                        <p
-                                            v-if="store.errors?.[`dependientes.${index}.nombres`]"
-                                            class="text-sm text-red-500"
-                                        >
-                                            {{ store.errors[`dependientes.${index}.nombres`][0] }}
-                                        </p>
-                                        <Input 
-                                        v-model="dependiente.apellidos"
-                                        placeholder="Apellidos"
-                                        />
-                                        <p
-                                        v-if="store.errors?.[`dependientes.${index}.apellidos`]"
-                                        class="text-sm text-red-500"
-                                        >
-                                            {{ store.errors[`dependientes.${index}.apellidos`][0] }}
-                                        </p>
+                                                <div class="flex justify-between items-center">
+                                                    <Label>
+                                                        Dependiente {{ index + 1 }}
+                                                    </Label>
+                                                    <Button
+                                                    v-if="store.form.dependientes.length > 1"
+                                                    type="button"
+                                                    variant="destructive"
+                                                    @click="store.eliminarDependiente(index)">
+                                                    Eliminar
+                                                    </Button>
+                                                </div>
+                                                <Input 
+                                                v-model="dependiente.nombres"
+                                                placeholder="Nombres"
+                                                />
+                                                <p
+                                                    v-if="store.errors?.[`dependientes.${index}.nombres`]"
+                                                    class="text-sm text-red-500"
+                                                >
+                                                    {{ store.errors[`dependientes.${index}.nombres`][0] }}
+                                                </p>
+                                                <Input 
+                                                v-model="dependiente.apellidos"
+                                                placeholder="Apellidos"
+                                                />
+                                                <p
+                                                v-if="store.errors?.[`dependientes.${index}.apellidos`]"
+                                                class="text-sm text-red-500"
+                                                >
+                                                    {{ store.errors[`dependientes.${index}.apellidos`][0] }}
+                                                </p>
+                                                <Label>Documento</Label>
+                                                <Input type="file"
+                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                @change="guardarArchivoDependiente($event, index)"/>
+                                                <p
+                                                v-if="store.errors?.[`dependientes.${index}.archivo`]"
+                                                class="text-sm text-red-500"
+                                                >
+                                                {{ store.errors[`dependientes.${index}.archivo`][0] }}
+                                                </p>
                                         </div>
                                         <Button
                                         v-if="store.form.dependientes.length < 4"

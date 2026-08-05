@@ -20,7 +20,8 @@ export const useSolicitudStore = defineStore('solicitud', () => {
         dependientes: [
             {
                 nombres: '',
-                apellidos: ''
+                apellidos: '',
+                archivo: null
             }
         ]
     });
@@ -29,7 +30,8 @@ export const useSolicitudStore = defineStore('solicitud', () => {
         if (form.value.dependientes.length >= 4) return;
         form.value.dependientes.push({
             nombres: '',
-            apellidos: ''
+            apellidos: '',
+            archivo: null
         });
     }
     function eliminarDependiente(index) {
@@ -63,10 +65,23 @@ export const useSolicitudStore = defineStore('solicitud', () => {
 
                         Object.keys(item).forEach(campo => {
 
-                            formData.append(
-                                `${key}[${index}][${campo}]`,
-                                item[campo]
-                            );
+                            const valorCampo = item[campo];
+
+                            if (valorCampo instanceof File) {
+
+                                formData.append(
+                                    `${key}[${index}][${campo}]`,
+                                    valorCampo
+                                );
+
+                            } else {
+
+                                formData.append(
+                                    `${key}[${index}][${campo}]`,
+                                    valorCampo
+                                );
+
+                            }
 
                         });
 
@@ -134,10 +149,18 @@ export const useSolicitudStore = defineStore('solicitud', () => {
                 if (Array.isArray(valor)) {
                     valor.forEach((item, index) => {
                         Object.keys(item).forEach(campo => {
-                            formData.append(
-                                `${key}[${index}][${campo}]`,
-                                item[campo]
-                            );
+                            const valorCampo = item[campo];
+                            if (valorCampo instanceof File) {
+                                formData.append(
+                                    `${key}[${index}][${campo}]`,
+                                    valorCampo
+                                );
+                            } else {
+                                formData.append(
+                                    `${key}[${index}][${campo}]`,
+                                    valorCampo
+                                );
+                            }
                         });
                     });
                 } else {
