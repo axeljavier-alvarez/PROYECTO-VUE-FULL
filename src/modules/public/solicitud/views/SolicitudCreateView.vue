@@ -270,7 +270,6 @@ watch(
                                 <Label>
                                     {{ tituloRazon }}
                                 </Label>
-
                                 <Textarea v-model="store.form.razon" :placeholder="placeholderRazon" />
                                 <p v-if="store.errors?.razon" class="text-sm text-red-500 mt-1">
                                     {{ store.errors.razon[0] }}

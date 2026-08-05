@@ -126,6 +126,7 @@ export const useSolicitudStore = defineStore('solicitud', () => {
             formData.append('step', step)
             Object.keys(form.value).forEach(key => {
                 const valor = form.value[key];
+                // enviar el arreglo dependientes solo cuando selecciona 1
                 if (key === 'dependientes' &&
                     form.value.tiene_dependientes !== '1') {
                     return;
