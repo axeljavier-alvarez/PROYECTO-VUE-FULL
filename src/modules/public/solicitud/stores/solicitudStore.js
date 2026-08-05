@@ -25,8 +25,8 @@ export const useSolicitudStore = defineStore('solicitud', () => {
         ]
     });
     const archivos = ref({});
-    function agregarDependiente(){
-        if(form.value.dependientes.length >= 4) return;
+    function agregarDependiente() {
+        if (form.value.dependientes.length >= 4) return;
         form.value.dependientes.push({
             nombres: '',
             apellidos: ''
@@ -48,14 +48,14 @@ export const useSolicitudStore = defineStore('solicitud', () => {
     async function createSolicitud() {
         loading.value = true;
         errors.value = {};
-
         try {
             const formData = new FormData();
-
             Object.keys(form.value).forEach(key => {
-
                 const valor = form.value[key];
-
+                if (key === 'dependientes' &&
+                    form.value.tiene_dependientes !== '1') {
+                    return;
+                }
                 // Si es un array (dependientes)
                 if (Array.isArray(valor)) {
 
@@ -71,13 +71,10 @@ export const useSolicitudStore = defineStore('solicitud', () => {
                         });
 
                     });
-
                 } else {
-
                     if (valor !== '' && valor !== null && valor !== undefined) {
 
                         formData.append(key, valor);
-
                     }
 
                 }
@@ -129,6 +126,10 @@ export const useSolicitudStore = defineStore('solicitud', () => {
             formData.append('step', step)
             Object.keys(form.value).forEach(key => {
                 const valor = form.value[key];
+                if (key === 'dependientes' &&
+                    form.value.tiene_dependientes !== '1') {
+                    return;
+                }
                 if (Array.isArray(valor)) {
                     valor.forEach((item, index) => {
                         Object.keys(item).forEach(campo => {
