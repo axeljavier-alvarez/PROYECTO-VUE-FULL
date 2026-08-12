@@ -1,7 +1,5 @@
 import apiClient from '@/api/axiosConfig';
-
 export default {
-
     async getAll(){
         try {
             const response = await apiClient.get('/tramites');

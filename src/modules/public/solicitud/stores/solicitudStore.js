@@ -17,6 +17,7 @@ export const useSolicitudStore = defineStore('solicitud', () => {
         zona: '',
         tramite_id: '',
         tiene_dependientes: '',
+        tipo_persona_penal: '',
         dependientes: [
             {
                 nombres: '',
@@ -37,6 +38,20 @@ export const useSolicitudStore = defineStore('solicitud', () => {
     function eliminarDependiente(index) {
         if (form.value.dependientes.length === 1) return;
         form.value.dependientes.splice(index, 1);
+    }
+    function cambiarTramite(nuevoTramiteId){
+        form.value.tramite_id = nuevoTramiteId;
+        form.value.razon = '';
+        form.value.tiene_dependientes = '';
+        form.value.tipo_persona_penal = '';
+        form.value.dependientes = [
+            {
+                nombres: '',
+                apellidos: '',
+                archivo: null
+            }
+        ];
+        
     }
     async function fetchTramites() {
         try {

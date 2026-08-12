@@ -272,6 +272,34 @@ watch(
                                     {{ store.errors.tramite_id[0] }}
                                 </p>
                             </div>
+                            <!-- SELECCIONAR SI ES MAYOR O MENOR DE EDAD -->
+                            <div
+                            v-if="String(store.form.tramite_id) === '6'"
+                            class="grid gap-2 mt-4">
+                                <Label class="font-semibold text-gray-700">
+                                    Edad de la persona
+                                </Label>
+                                <Select v-model="store.form.tipo_persona_penal">
+                                    <SelectTrigger class="w-full">
+                                        <SelectValue placeholder="Seleccione una opción"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="mayor">
+                                                Mayor de edad
+                                            </SelectItem>
+                                            <SelectItem value="menor">
+                                                Menor de edad
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                <p v-if="store.errors?.tipo_persona_penal"
+                                class="text-sm text-red-500 mt-1">
+                                    {{ store.errors.tipo_persona_penal[0] }}
+                                </p>
+                            </div>
+                            <!-- RAZON -->
                             <div v-if="store.form.tramite_id && store.form.tramite_id !== '0'" class="grid gap-2 mt-4">
                                 <Label>
                                     {{ tituloRazon }}
